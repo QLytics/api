@@ -1,20 +1,29 @@
-// export const Block = objectType({
-//   name: 'Block',
-//   definition: t => {
-//     t.id('hash');
-//     t.string('height');
-//     t.string('prev_hash');
-//     t.string('timestamp');
-//     t.string('total_supply');
-//     t.string('gas_price');
-//     t.string('author_account_id');
-//   }
-// });
-
 import { gql } from 'apollo-server-cloudflare';
 
-export const Block = gql`
+export interface Block {
+  hash: string;
+  height: string;
+  prev_hash: string;
+  timestamp: string;
+  total_supply: string;
+  gas_price: string;
+  author_account_id: string;
+}
+
+export const BlockType = gql`
   type Block {
+    hash: ID!
+    height: String!
+    prev_hash: String!
+    timestamp: String!
+    total_supply: String!
+    gas_price: String!
+    author_account_id: String!
+  }
+`;
+
+export const NewBlockType = gql`
+  input NewBlock {
     hash: ID!
     height: String!
     prev_hash: String!

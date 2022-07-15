@@ -1,8 +1,8 @@
 import { DataSource } from 'apollo-datasource';
 
-import { Block, IDatabase } from './type-defs';
+import { Block } from '../schema';
 
-export class Database extends DataSource implements IDatabase {
+export class Database extends DataSource {
   constructor() {
     super();
   }

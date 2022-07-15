@@ -2,13 +2,13 @@ import { ApolloServer } from 'apollo-server-cloudflare';
 import { graphqlCloudflare } from 'apollo-server-cloudflare/dist/cloudflareApollo';
 import { Request, Response } from 'apollo-server-env';
 
-import { Database } from './database';
+import { dataSources } from './context';
 import { playground } from './playground';
 import { resolvers } from './resolver';
-import typeDefs from './schema';
+import { typeDefs } from './schema';
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request): Promise<Response> {
     if (request.method === 'OPTIONS') {
       const response = new Response('', { status: 204 });
       setupCORS(request, response);
@@ -46,9 +46,6 @@ function setupCORS(request: Request, response: Response) {
     response.headers.set('Access-Control-Allow-Origin', origin);
   }
 }
-const dataSources = () => ({
-  database: new Database()
-});
 
 const createServer = () =>
   new ApolloServer({

@@ -1,9 +1,11 @@
-import { Block } from './type-defs';
+import type { IExecutableSchemaDefinition } from '@graphql-tools/schema';
 
-export const resolvers = {
+import { Context } from './context';
+import { Block } from './schema';
+
+export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
   Query: {
-    block: async (_source: any, { hash }: Block, { dataSources }: any) => {
-      console.log('hash', hash);
+    block: async (_: unknown, { hash }: Block, { dataSources }: Context) => {
       return dataSources.database.getBlock(hash);
     }
   }

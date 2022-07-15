@@ -1,27 +1,13 @@
 import { gql } from 'apollo-server-cloudflare';
 
-// import { Block } from './block';
+import { Block, BlockType, NewBlockType } from './block';
 
-export default gql`
-  type Block {
-    hash: ID!
-    height: String!
-    prev_hash: String!
-    timestamp: String!
-    total_supply: String!
-    gas_price: String!
-    author_account_id: String!
-  }
+export { Block };
 
-  input NewBlock {
-    hash: ID!
-    height: String!
-    prev_hash: String!
-    timestamp: String!
-    total_supply: String!
-    gas_price: String!
-    author_account_id: String!
-  }
+export const typeDefs = gql`
+  ${BlockType}
+
+  ${NewBlockType}
 
   type Mutation {
     addBlocks(blocks: [NewBlock!]!): [Block]
@@ -31,5 +17,3 @@ export default gql`
     block(hash: ID!): Block
   }
 `;
-
-// export const typeDef: TypeSource = { Block };
