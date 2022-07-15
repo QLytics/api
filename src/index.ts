@@ -16,7 +16,7 @@ export default {
     }
     try {
       const url = new URL(request.url);
-      if (url.pathname === '/__graphql') {
+      if (url.pathname === '/graphql') {
         const response = playground();
         return response;
       } else {
