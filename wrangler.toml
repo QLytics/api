@@ -3,3 +3,11 @@ workers_dev = true
 compatibility_date = "2022-07-14"
 main = "src/index.ts"
 node_compat = true
+usage_model = "bundled"
+
+
+[env.production]
+workers_dev = false
+routes = [
+  "api.qlytics.dev/*"
+]
