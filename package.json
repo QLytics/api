@@ -1,5 +1,6 @@
 {
   "private": true,
+  "sideEffects": false,
   "name": "qlytics-api",
   "version": "1.0.0",
   "description": "",
@@ -10,9 +11,13 @@
   },
   "author": "Mario Reder <mario.reder@pm.me>",
   "license": "MIT",
+  "dependencies": {
+    "apollo-datasource": "^3",
+    "apollo-server-cloudflare": "^3",
+    "graphql": "^16"
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "^3",
-    "@esbuild-plugins/node-globals-polyfill": "^0.1",
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5",
     "esbuild": "^0.14",

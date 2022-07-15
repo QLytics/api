@@ -1,30 +1,68 @@
+import { ApolloServer } from 'apollo-server-cloudflare';
+import { graphqlCloudflare } from 'apollo-server-cloudflare/dist/cloudflareApollo';
+import { Request, Response } from 'apollo-server-env';
+
+import { Database } from './database';
+import { playground } from './playground';
+import { resolvers } from './resolver';
+import typeDefs from './schema';
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === 'OPTIONS') {
-      const headers = new Headers();
-      setupCORS(request, headers);
-      return new Response('', { status: 204, headers });
+      const response = new Response('', { status: 204 });
+      setupCORS(request, response);
+      return response;
     }
     try {
-      const response = new Response('', { status: 204 });
-      setupCORS(request, response.headers);
-      return response;
-    } catch (e) {
-      const headers = new Headers();
-      setupCORS(request, headers);
-      if (e instanceof Error) {
-        console.log('Internal Error', e.message);
-        return new Response(e.message, { status: 500, headers });
+      const url = new URL(request.url);
+      if (url.pathname === '/__graphql') {
+        const response = playground();
+        return response;
+      } else {
+        const response = await graphQLServer(request);
+        setupCORS(request, response);
+        return response;
       }
-      console.log('Internal Error', e);
-      return new Response('Unknown Error', { status: 500, headers });
+    } catch (e) {
+      if (e instanceof Error) {
+        const response = new Response(e.message, { status: 500 });
+        setupCORS(request, response);
+        console.log('Internal Error', e.message);
+        return response;
+      } else {
+        const response = new Response('Unknown Error', { status: 500 });
+        setupCORS(request, response);
+        console.log('Internal Error', e);
+        return response;
+      }
     }
   }
 };
 
-function setupCORS(request: Request, headers: Headers) {
+function setupCORS(request: Request, response: Response) {
   const origin = request.headers.get('Origin');
   if (origin != null) {
-    headers.set('Access-Control-Allow-Origin', origin);
+    response.headers.set('Access-Control-Allow-Origin', origin);
   }
 }
+const dataSources = () => ({
+  database: new Database()
+});
+
+const createServer = () =>
+  new ApolloServer({
+    typeDefs,
+    resolvers,
+    introspection: true,
+    dataSources,
+    cache: 'bounded'
+  });
+
+const graphQLServer = async (request: Request) => {
+  const server = createServer();
+  await server.start();
+  return graphqlCloudflare(() => server.createGraphQLServerOptions(request))(
+    request
+  );
+};
