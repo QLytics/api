@@ -18,4 +18,18 @@ export class Database extends DataSource {
       author_account_id: ''
     };
   }
+
+  public async getBlocks(since_hash: string, limit = 100): Promise<Block[]> {
+    return [
+      {
+        hash: String(limit),
+        height: '',
+        prev_hash: '',
+        timestamp: '',
+        total_supply: '',
+        gas_price: '',
+        author_account_id: ''
+      }
+    ];
+  }
 }

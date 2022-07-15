@@ -1,8 +1,8 @@
 import { gql } from 'apollo-server-cloudflare';
 
-import { Block, BlockType, NewBlockType } from './block';
+import { Block, BlockType, NewBlockType, GetBlocks } from './block';
 
-export { Block };
+export { Block, GetBlocks };
 
 export const typeDefs = gql`
   ${BlockType}
@@ -15,5 +15,6 @@ export const typeDefs = gql`
 
   type Query {
     block(hash: ID!): Block
+    blocks(since_hash: ID!, limit: Int = 100): [Block]
   }
 `;

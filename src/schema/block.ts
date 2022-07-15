@@ -10,6 +10,11 @@ export interface Block {
   author_account_id: string;
 }
 
+export interface GetBlocks {
+  since_hash: string;
+  limit?: number;
+}
+
 export const BlockType = gql`
   type Block {
     hash: ID!
