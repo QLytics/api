@@ -7,6 +7,10 @@ export class Database extends DataSource {
     super();
   }
 
+  public async addBlocks(blocks: Block[]): Promise<Block[]> {
+    return blocks;
+  }
+
   public async getBlock(hash: string): Promise<Block> {
     return {
       hash,

@@ -15,5 +15,14 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
     ) => {
       return dataSources.database.getBlocks(since_hash, limit);
     }
+  },
+  Mutation: {
+    addBlocks: async (
+      _: unknown,
+      { blocks }: { blocks: Block[] },
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.addBlocks(blocks);
+    }
   }
 };

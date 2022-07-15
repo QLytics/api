@@ -10,7 +10,7 @@ export const typeDefs = gql`
   ${NewBlockType}
 
   type Mutation {
-    addBlocks(blocks: [NewBlock!]!): [Block]
+    addBlocks(blocks: [NewBlock]!): [Block]
   }
 
   type Query {
