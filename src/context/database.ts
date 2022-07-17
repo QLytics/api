@@ -1,6 +1,6 @@
 import { DataSource } from 'apollo-datasource';
 
-import { Block } from '../schema';
+import { Block, Chunk } from '../schema';
 
 export class Database extends DataSource {
   constructor() {
@@ -33,6 +33,37 @@ export class Database extends DataSource {
         timestamp: '',
         total_supply: '',
         gas_price: '',
+        author_account_id: ''
+      }
+    ];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async addChunks(chunks: Chunk[]): Promise<Chunk[]> {
+    return [];
+  }
+
+  public async getChunk(hash: string): Promise<Chunk> {
+    return {
+      hash,
+      block_hash: '',
+      shard_id: '',
+      signature: '',
+      gas_used: '',
+      gas_limit: '',
+      author_account_id: ''
+    };
+  }
+
+  public async getChunks(since_hash: string, limit = 100): Promise<Chunk[]> {
+    return [
+      {
+        hash: String(limit),
+        block_hash: '',
+        shard_id: '',
+        signature: '',
+        gas_used: '',
+        gas_limit: '',
         author_account_id: ''
       }
     ];
