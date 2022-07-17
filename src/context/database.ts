@@ -7,8 +7,9 @@ export class Database extends DataSource {
     super();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async addBlocks(blocks: Block[]): Promise<Block[]> {
-    return blocks;
+    return [];
   }
 
   public async getBlock(hash: string): Promise<Block> {
