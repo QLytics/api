@@ -1,6 +1,6 @@
 import { DataSource } from 'apollo-datasource';
 
-import { Block, Chunk } from '../schema';
+import { Block, BlockData, Chunk } from '../schema';
 
 export class Database extends DataSource {
   constructor() {
@@ -8,7 +8,7 @@ export class Database extends DataSource {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async addBlocks(blocks: Block[]): Promise<Block[]> {
+  public async addBlockData(blockData: BlockData[]): Promise<Block[]> {
     return [];
   }
 
@@ -36,11 +36,6 @@ export class Database extends DataSource {
         author_account_id: ''
       }
     ];
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async addChunks(chunks: Chunk[]): Promise<Chunk[]> {
-    return [];
   }
 
   public async getChunk(hash: string): Promise<Chunk> {

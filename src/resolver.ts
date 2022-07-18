@@ -1,7 +1,7 @@
 import type { IExecutableSchemaDefinition } from '@graphql-tools/schema';
 
 import { Context } from './context';
-import { Block, Chunk, GetBlocks, GetChunks } from './schema';
+import { Block, BlockData, Chunk, GetBlocks, GetChunks } from './schema';
 
 export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
   Query: {
@@ -27,19 +27,12 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
     }
   },
   Mutation: {
-    addBlocks: async (
+    addBlockData: async (
       _: unknown,
-      { blocks }: { blocks: Block[] },
+      { block_data: blockData }: { block_data: BlockData[] },
       { dataSources }: Context
     ) => {
-      return dataSources.database.addBlocks(blocks);
-    },
-    addChunks: async (
-      _: unknown,
-      { chunks }: { chunks: Chunk[] },
-      { dataSources }: Context
-    ) => {
-      return dataSources.database.addChunks(chunks);
+      return dataSources.database.addBlockData(blockData);
     }
   }
 };

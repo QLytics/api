@@ -5,6 +5,11 @@ import { Chunk, GetChunks, ChunkType, NewChunkType } from './chunk';
 
 export { Block, Chunk, GetChunks, GetBlocks };
 
+export interface BlockData {
+  block: Block;
+  chunks: Chunk[];
+}
+
 export const typeDefs = gql`
   ${BlockType}
   ${NewBlockType}
@@ -12,9 +17,13 @@ export const typeDefs = gql`
   ${ChunkType}
   ${NewChunkType}
 
+  input BlockData {
+    block: NewBlock!
+    chunks: [NewChunk!]!
+  }
+
   type Mutation {
-    addBlocks(blocks: [NewBlock!]!): [Block]
-    addChunks(chunks: [NewChunk!]!): [Chunk]
+    addBlockData(block_data: [BlockData!]!): [Block]
   }
 
   type Query {
