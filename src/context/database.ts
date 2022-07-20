@@ -1,6 +1,6 @@
 import { DataSource } from 'apollo-datasource';
 
-import { Block, BlockData, Chunk } from '../schema';
+import { Block, BlockData, Chunk, Transaction } from '../schema';
 
 export class Database extends DataSource {
   constructor() {
@@ -60,6 +60,49 @@ export class Database extends DataSource {
         gas_used: '',
         gas_limit: '',
         author_account_id: ''
+      }
+    ];
+  }
+
+  public async getTransaction(hash: string): Promise<Transaction> {
+    return {
+      hash,
+      block_hash: '',
+      chunk_hash: '',
+      chunk_index: 0,
+      timestamp: '',
+      signer_id: '',
+      public_key: '',
+      nonce: '',
+      receiver_id: '',
+      signature: '',
+      status: '',
+      receipt_id: '',
+      gas_burnt: '',
+      tokens_burnt: ''
+    };
+  }
+
+  public async getTransactions(
+    since_hash: string,
+    limit = 100
+  ): Promise<Transaction[]> {
+    return [
+      {
+        hash: String(limit),
+        block_hash: '',
+        chunk_hash: '',
+        chunk_index: 0,
+        timestamp: '',
+        signer_id: '',
+        public_key: '',
+        nonce: '',
+        receiver_id: '',
+        signature: '',
+        status: '',
+        receipt_id: '',
+        gas_burnt: '',
+        tokens_burnt: ''
       }
     ];
   }

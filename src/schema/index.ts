@@ -2,8 +2,13 @@ import { gql } from 'apollo-server-cloudflare';
 
 import { Block, BlockType, NewBlockType, GetBlocks } from './block';
 import { Chunk, GetChunks, ChunkType, NewChunkType } from './chunk';
+import {
+  NewTransactionType,
+  Transaction,
+  TransactionType
+} from './transaction';
 
-export { Block, Chunk, GetChunks, GetBlocks };
+export { Block, Chunk, GetChunks, GetBlocks, Transaction };
 
 export interface BlockData {
   block: Block;
@@ -17,9 +22,13 @@ export const typeDefs = gql`
   ${ChunkType}
   ${NewChunkType}
 
+  ${TransactionType}
+  ${NewTransactionType}
+
   input BlockData {
     block: NewBlock!
     chunks: [NewChunk!]!
+    transactions: [NewTransaction!]!
   }
 
   type Mutation {
@@ -31,5 +40,7 @@ export const typeDefs = gql`
     blocks(since_hash: ID!, limit: Int = 100): [Block]
     chunk(hash: ID!): Chunk
     chunks(since_hash: ID!, limit: Int = 100): [Chunk]
+    transaction(hash: ID!): Transaction
+    transactions(since_hash: ID!, limit: Int = 100): [Transaction]
   }
 `;

@@ -2,6 +2,7 @@ import type { IExecutableSchemaDefinition } from '@graphql-tools/schema';
 
 import { Context } from './context';
 import { Block, BlockData, Chunk, GetBlocks, GetChunks } from './schema';
+import { GetTransactions } from './schema/transaction';
 
 export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
   Query: {
@@ -24,6 +25,20 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
       { dataSources }: Context
     ) => {
       return dataSources.database.getBlocks(since_hash, limit);
+    },
+    transaction: async (
+      _: unknown,
+      { hash }: Chunk,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getTransaction(hash);
+    },
+    transactions: async (
+      _: unknown,
+      { since_hash, limit }: GetTransactions,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getTransactions(since_hash, limit);
     }
   },
   Mutation: {
