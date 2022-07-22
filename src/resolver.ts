@@ -1,8 +1,15 @@
 import type { IExecutableSchemaDefinition } from '@graphql-tools/schema';
 
 import { Context } from './context';
-import { Block, BlockData, Chunk, GetBlocks, GetChunks } from './schema';
-import { GetTransactions } from './schema/transaction';
+import {
+  Block,
+  BlockData,
+  Chunk,
+  GetBlocks,
+  GetChunks,
+  GetTransactions,
+  GetTransactionActions
+} from './schema';
 
 export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
   Query: {
@@ -39,6 +46,20 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
       { dataSources }: Context
     ) => {
       return dataSources.database.getTransactions(since_hash, limit);
+    },
+    transactionAction: async (
+      _: unknown,
+      { hash }: Chunk,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getTransactionAction(hash);
+    },
+    transactionActions: async (
+      _: unknown,
+      { since_hash, limit }: GetTransactionActions,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getTransactionActions(since_hash, limit);
     }
   },
   Mutation: {
