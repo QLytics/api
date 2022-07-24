@@ -4,6 +4,8 @@ import {
   Block,
   BlockData,
   Chunk,
+  DataReceipt,
+  Receipt,
   Transaction,
   TransactionAction
 } from '../schema';
@@ -132,6 +134,60 @@ export class Database extends DataSource {
         transaction_index: 0,
         action_kind: '',
         args: ''
+      }
+    ];
+  }
+
+  public async getReceipt(receipt_id: string): Promise<Receipt> {
+    return {
+      receipt_id,
+      block_hash: '',
+      chunk_hash: '',
+      chunk_index: 0,
+      timestamp: '',
+      predecessor_id: '',
+      receiver_id: '',
+      receipt_kind: '',
+      transaction_hash: ''
+    };
+  }
+
+  public async getReceipts(
+    since_receipt_id: string,
+    limit = 100
+  ): Promise<Receipt[]> {
+    return [
+      {
+        receipt_id: since_receipt_id,
+        block_hash: '',
+        chunk_hash: '',
+        chunk_index: 0,
+        timestamp: '',
+        predecessor_id: '',
+        receiver_id: '',
+        receipt_kind: '',
+        transaction_hash: ''
+      }
+    ];
+  }
+
+  public async getDataReceipt(data_id: string): Promise<DataReceipt> {
+    return {
+      data_id,
+      receipt_id: '',
+      data_base64: ''
+    };
+  }
+
+  public async getDataReceipts(
+    since_data_id: string,
+    limit = 100
+  ): Promise<DataReceipt[]> {
+    return [
+      {
+        data_id: since_data_id,
+        receipt_id: '',
+        data_base64: ''
       }
     ];
   }

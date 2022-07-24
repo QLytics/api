@@ -3,6 +3,13 @@ import { gql } from 'apollo-server-cloudflare';
 import { Block, BlockType, NewBlockType, GetBlocks } from './block';
 import { Chunk, GetChunks, ChunkType, NewChunkType } from './chunk';
 import {
+  DataReceipt,
+  DataReceiptType,
+  GetDataReceipts,
+  NewDataReceiptType
+} from './data_receipt';
+import { GetReceipts, NewReceiptType, Receipt, ReceiptType } from './receipt';
+import {
   GetTransactions,
   NewTransactionType,
   Transaction,
@@ -23,14 +30,20 @@ export {
   Transaction,
   TransactionAction,
   GetTransactions,
-  GetTransactionActions
+  GetTransactionActions,
+  GetReceipts,
+  GetDataReceipts,
+  Receipt,
+  DataReceipt
 };
 
 export interface BlockData {
   block: Block;
   chunks: Chunk[];
   transactions: Transaction[];
-  transactionActions: TransactionAction[];
+  transaction_actions: TransactionAction[];
+  receipts: Receipt[];
+  data_receipts: DataReceipt[];
 }
 
 export const typeDefs = gql`
@@ -46,11 +59,19 @@ export const typeDefs = gql`
   ${TransactionActionType}
   ${NewTransactionActionType}
 
+  ${ReceiptType}
+  ${NewReceiptType}
+
+  ${DataReceiptType}
+  ${NewDataReceiptType}
+
   input BlockData {
     block: NewBlock!
     chunks: [NewChunk!]!
     transactions: [NewTransaction!]!
-    transactionActions: [NewTransactionAction!]!
+    transaction_actions: [NewTransactionAction!]!
+    receipts: [NewReceipt!]!
+    data_receipts: [NewDataReceipt!]!
   }
 
   type Mutation {
@@ -66,5 +87,9 @@ export const typeDefs = gql`
     transactions(since_hash: ID!, limit: Int = 100): [Transaction]
     transactionAction(hash: ID!): TransactionAction
     transactionActions(since_hash: ID!, limit: Int = 100): [TransactionAction]
+    receipt(receipt_id: ID!): Receipt
+    receipts(since_receipt_id: ID!, limit: Int = 100): [Receipt]
+    dataReceipt(data_id: ID!): DataReceipt
+    dataReceipts(since_data_id: ID!, limit: Int = 100): [DataReceipt]
   }
 `;
