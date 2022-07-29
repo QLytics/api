@@ -5,20 +5,20 @@ import {
   Block,
   BlockData,
   Chunk,
+  DataReceipt,
+  ExecutionOutcome,
+  ExecutionOutcomeReceipt,
   GetBlocks,
   GetChunks,
-  GetTransactions,
-  GetTransactionActions,
-  Receipt,
-  GetReceipts,
-  TransactionAction,
-  Transaction,
-  DataReceipt,
   GetDataReceipts,
-  ExecutionOutcome,
+  GetExecutionOutcomeReceipts,
   GetExecutionOutcomes,
-  ExecutionOutcomeReceipt,
-  GetExecutionOutcomeReceipts
+  GetReceipts,
+  GetTransactionActions,
+  GetTransactions,
+  Receipt,
+  Transaction,
+  TransactionAction
 } from './schema';
 
 export const resolvers: IExecutableSchemaDefinition['resolvers'] = {

@@ -32,6 +32,12 @@
           "order": "asc"
         }
       }
+    ],
+    "sort-imports": [
+      "error",
+      {
+        "ignoreDeclarationSort": true
+      }
     ]
   }
 }

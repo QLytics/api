@@ -1,7 +1,7 @@
 import { gql } from 'apollo-server-cloudflare';
 
-import { Block, BlockType, NewBlockType, GetBlocks } from './block';
-import { Chunk, GetChunks, ChunkType, NewChunkType } from './chunk';
+import { Block, BlockType, GetBlocks, NewBlockType } from './block';
+import { Chunk, ChunkType, GetChunks, NewChunkType } from './chunk';
 import {
   DataReceipt,
   DataReceiptType,
@@ -9,16 +9,16 @@ import {
   NewDataReceiptType
 } from './data_receipt';
 import {
-  ExecutionOutcomeType,
-  NewExecutionOutcomeType,
   ExecutionOutcome,
-  GetExecutionOutcomes
+  ExecutionOutcomeType,
+  GetExecutionOutcomes,
+  NewExecutionOutcomeType
 } from './execution_outcome';
 import {
+  ExecutionOutcomeReceipt,
   ExecutionOutcomeReceiptType,
-  NewExecutionOutcomeReceiptType,
   GetExecutionOutcomeReceipts,
-  ExecutionOutcomeReceipt
+  NewExecutionOutcomeReceiptType
 } from './execution_outcome_receipt';
 import { GetReceipts, NewReceiptType, Receipt, ReceiptType } from './receipt';
 import {
