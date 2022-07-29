@@ -14,7 +14,11 @@ import {
   TransactionAction,
   Transaction,
   DataReceipt,
-  GetDataReceipts
+  GetDataReceipts,
+  ExecutionOutcome,
+  GetExecutionOutcomes,
+  ExecutionOutcomeReceipt,
+  GetExecutionOutcomeReceipts
 } from './schema';
 
 export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
@@ -94,6 +98,37 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
       { dataSources }: Context
     ) => {
       return dataSources.database.getDataReceipts(since_data_id, limit);
+    },
+    executionOutcome: async (
+      _: unknown,
+      { receipt_id }: ExecutionOutcome,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getExecutionOutcome(receipt_id);
+    },
+    executionOutcomes: async (
+      _: unknown,
+      { since_receipt_id, limit }: GetExecutionOutcomes,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getExecutionOutcomes(since_receipt_id, limit);
+    },
+    executionOutcomeReceipt: async (
+      _: unknown,
+      { receipt_id }: ExecutionOutcomeReceipt,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getExecutionOutcomeReceipt(receipt_id);
+    },
+    executionOutcomeReceipts: async (
+      _: unknown,
+      { since_receipt_id, limit }: GetExecutionOutcomeReceipts,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getExecutionOutcomeReceipts(
+        since_receipt_id,
+        limit
+      );
     }
   },
   Mutation: {

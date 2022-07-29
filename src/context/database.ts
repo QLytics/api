@@ -5,6 +5,8 @@ import {
   BlockData,
   Chunk,
   DataReceipt,
+  ExecutionOutcome,
+  ExecutionOutcomeReceipt,
   Receipt,
   Transaction,
   TransactionAction
@@ -188,6 +190,64 @@ export class Database extends DataSource {
         data_id: since_data_id,
         receipt_id: '',
         data_base64: ''
+      }
+    ];
+  }
+
+  public async getExecutionOutcome(
+    receipt_id: string
+  ): Promise<ExecutionOutcome> {
+    return {
+      receipt_id,
+      block_hash: '',
+      chunk_index: 0,
+      timestamp: '',
+      gas_burnt: '',
+      tokens_burnt: '',
+      account_id: '',
+      status: '',
+      shard: ''
+    };
+  }
+
+  public async getExecutionOutcomes(
+    since_receipt_id: string,
+    limit = 100
+  ): Promise<ExecutionOutcome[]> {
+    return [
+      {
+        receipt_id: since_receipt_id,
+        block_hash: '',
+        chunk_index: 0,
+        timestamp: '',
+        gas_burnt: '',
+        tokens_burnt: '',
+        account_id: '',
+        status: '',
+        shard: ''
+      }
+    ];
+  }
+
+  public async getExecutionOutcomeReceipt(
+    receipt_id: string
+  ): Promise<ExecutionOutcomeReceipt> {
+    return {
+      receipt_id,
+      index_in_execution_outcome: 0,
+      produced_receipt_id: ''
+    };
+  }
+
+  public async getExecutionOutcomeReceipts(
+    since_receipt_id: string,
+    limit = 100
+  ): Promise<ExecutionOutcomeReceipt[]> {
+    return [
+      {
+        receipt_id: since_receipt_id,
+        index_in_execution_outcome: 0,
+        produced_receipt_id: ''
       }
     ];
   }

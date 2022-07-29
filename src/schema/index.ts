@@ -8,6 +8,18 @@ import {
   GetDataReceipts,
   NewDataReceiptType
 } from './data_receipt';
+import {
+  ExecutionOutcomeType,
+  NewExecutionOutcomeType,
+  ExecutionOutcome,
+  GetExecutionOutcomes
+} from './execution_outcome';
+import {
+  ExecutionOutcomeReceiptType,
+  NewExecutionOutcomeReceiptType,
+  GetExecutionOutcomeReceipts,
+  ExecutionOutcomeReceipt
+} from './execution_outcome_receipt';
 import { GetReceipts, NewReceiptType, Receipt, ReceiptType } from './receipt';
 import {
   GetTransactions,
@@ -34,7 +46,11 @@ export {
   GetReceipts,
   GetDataReceipts,
   Receipt,
-  DataReceipt
+  DataReceipt,
+  ExecutionOutcome,
+  GetExecutionOutcomes,
+  ExecutionOutcomeReceipt,
+  GetExecutionOutcomeReceipts
 };
 
 export interface BlockData {
@@ -65,6 +81,12 @@ export const typeDefs = gql`
   ${DataReceiptType}
   ${NewDataReceiptType}
 
+  ${ExecutionOutcomeType}
+  ${NewExecutionOutcomeType}
+
+  ${ExecutionOutcomeReceiptType}
+  ${NewExecutionOutcomeReceiptType}
+
   input BlockData {
     block: NewBlock!
     chunks: [NewChunk!]!
@@ -72,6 +94,8 @@ export const typeDefs = gql`
     transaction_actions: [NewTransactionAction!]!
     receipts: [NewReceipt!]!
     data_receipts: [NewDataReceipt!]!
+    execution_outcomes: [NewExecutionOutcome!]!
+    execution_outcome_receipts: [NewExecutionOutcomeReceipt!]!
   }
 
   type Mutation {
@@ -91,5 +115,15 @@ export const typeDefs = gql`
     receipts(since_receipt_id: ID!, limit: Int = 100): [Receipt]
     dataReceipt(data_id: ID!): DataReceipt
     dataReceipts(since_data_id: ID!, limit: Int = 100): [DataReceipt]
+    executionOutcome(receipt_id: ID!): ExecutionOutcome
+    executionOutcomes(
+      since_receipt_id: ID!
+      limit: Int = 100
+    ): [ExecutionOutcome]
+    executionOutcomeReceipt(receipt_id: ID!): ExecutionOutcomeReceipt
+    executionOutcomeReceipts(
+      since_receipt_id: ID!
+      limit: Int = 100
+    ): [ExecutionOutcomeReceipt]
   }
 `;
