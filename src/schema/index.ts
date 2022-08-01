@@ -1,5 +1,11 @@
 import { gql } from 'apollo-server-cloudflare';
 
+import {
+  ActionReceipt,
+  ActionReceiptType,
+  GetActionReceipts,
+  NewActionReceiptType
+} from './action_receipt';
 import { Block, BlockType, GetBlocks, NewBlockType } from './block';
 import { Chunk, ChunkType, GetChunks, NewChunkType } from './chunk';
 import {
@@ -35,6 +41,7 @@ import {
 } from './transaction_action';
 
 export {
+  ActionReceipt,
   Block,
   Chunk,
   GetChunks,
@@ -45,6 +52,7 @@ export {
   GetTransactionActions,
   GetReceipts,
   GetDataReceipts,
+  GetActionReceipts,
   Receipt,
   DataReceipt,
   ExecutionOutcome,
@@ -81,6 +89,9 @@ export const typeDefs = gql`
   ${DataReceiptType}
   ${NewDataReceiptType}
 
+  ${ActionReceiptType}
+  ${NewActionReceiptType}
+
   ${ExecutionOutcomeType}
   ${NewExecutionOutcomeType}
 
@@ -94,6 +105,7 @@ export const typeDefs = gql`
     transaction_actions: [NewTransactionAction!]!
     receipts: [NewReceipt!]!
     data_receipts: [NewDataReceipt!]!
+    action_receipts: [NewActionReceipt!]!
     execution_outcomes: [NewExecutionOutcome!]!
     execution_outcome_receipts: [NewExecutionOutcomeReceipt!]!
   }
@@ -115,6 +127,8 @@ export const typeDefs = gql`
     receipts(since_receipt_id: ID!, limit: Int = 100): [Receipt]
     dataReceipt(data_id: ID!): DataReceipt
     dataReceipts(since_data_id: ID!, limit: Int = 100): [DataReceipt]
+    actionReceipt(data_id: ID!): ActionReceipt
+    actionReceipts(since_receipt_id: ID!, limit: Int = 100): [ActionReceipt]
     executionOutcome(receipt_id: ID!): ExecutionOutcome
     executionOutcomes(
       since_receipt_id: ID!

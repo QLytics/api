@@ -2,12 +2,14 @@ import type { IExecutableSchemaDefinition } from '@graphql-tools/schema';
 
 import { Context } from './context';
 import {
+  ActionReceipt,
   Block,
   BlockData,
   Chunk,
   DataReceipt,
   ExecutionOutcome,
   ExecutionOutcomeReceipt,
+  GetActionReceipts,
   GetBlocks,
   GetChunks,
   GetDataReceipts,
@@ -98,6 +100,20 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
       { dataSources }: Context
     ) => {
       return dataSources.database.getDataReceipts(since_data_id, limit);
+    },
+    actionReceipt: async (
+      _: unknown,
+      { receipt_id }: ActionReceipt,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getActionReceipt(receipt_id);
+    },
+    actionReceipts: async (
+      _: unknown,
+      { since_receipt_id, limit }: GetActionReceipts,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getActionReceipts(since_receipt_id, limit);
     },
     executionOutcome: async (
       _: unknown,

@@ -11,6 +11,7 @@ import {
   Transaction,
   TransactionAction
 } from '../schema';
+import { ActionReceipt } from '../schema/action_receipt';
 
 export class Database extends DataSource {
   constructor() {
@@ -190,6 +191,29 @@ export class Database extends DataSource {
         data_id: since_data_id,
         receipt_id: '',
         data_base64: ''
+      }
+    ];
+  }
+
+  public async getActionReceipt(receipt_id: string): Promise<ActionReceipt> {
+    return {
+      receipt_id,
+      signer_account_id: '',
+      signer_public_key: '',
+      gas_price: ''
+    };
+  }
+
+  public async getActionReceipts(
+    since_receipt_id: string,
+    limit = 100
+  ): Promise<ActionReceipt[]> {
+    return [
+      {
+        receipt_id: since_receipt_id,
+        signer_account_id: '',
+        signer_public_key: '',
+        gas_price: ''
       }
     ];
   }
