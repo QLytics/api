@@ -4,6 +4,7 @@ import { Context } from './context';
 import {
   ActionReceipt,
   ActionReceiptAction,
+  ActionReceiptInputData,
   Block,
   BlockData,
   Chunk,
@@ -11,6 +12,7 @@ import {
   ExecutionOutcome,
   ExecutionOutcomeReceipt,
   GetActionReceiptActions,
+  GetActionReceiptInputDatas,
   GetActionReceipts,
   GetBlocks,
   GetChunks,
@@ -131,6 +133,23 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
     ) => {
       return dataSources.database.getActionReceiptActions(
         since_receipt_id,
+        limit
+      );
+    },
+    actionReceiptInputData: async (
+      _: unknown,
+      { data_id }: ActionReceiptInputData,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getActionReceiptInputData(data_id);
+    },
+    actionReceiptInputDatas: async (
+      _: unknown,
+      { since_data_id, limit }: GetActionReceiptInputDatas,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getActionReceiptInputDatas(
+        since_data_id,
         limit
       );
     },

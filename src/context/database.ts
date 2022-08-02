@@ -2,6 +2,7 @@ import { DataSource } from 'apollo-datasource';
 
 import {
   ActionReceiptAction,
+  ActionReceiptInputData,
   Block,
   BlockData,
   Chunk,
@@ -246,6 +247,27 @@ export class Database extends DataSource {
         predecessor_id: '',
         receiver_id: '',
         timestamp: ''
+      }
+    ];
+  }
+
+  public async getActionReceiptInputData(
+    data_id: string
+  ): Promise<ActionReceiptInputData> {
+    return {
+      data_id,
+      receipt_id: ''
+    };
+  }
+
+  public async getActionReceiptInputDatas(
+    since_data_id: string,
+    limit = 100
+  ): Promise<ActionReceiptInputData[]> {
+    return [
+      {
+        data_id: since_data_id,
+        receipt_id: ''
       }
     ];
   }
