@@ -1,6 +1,7 @@
 import { DataSource } from 'apollo-datasource';
 
 import {
+  ActionReceiptAction,
   Block,
   BlockData,
   Chunk,
@@ -214,6 +215,37 @@ export class Database extends DataSource {
         signer_account_id: '',
         signer_public_key: '',
         gas_price: ''
+      }
+    ];
+  }
+
+  public async getActionReceiptAction(
+    receipt_id: string
+  ): Promise<ActionReceiptAction> {
+    return {
+      receipt_id,
+      index_in_action_receipt: 0,
+      action_kind: '',
+      args: '',
+      predecessor_id: '',
+      receiver_id: '',
+      timestamp: ''
+    };
+  }
+
+  public async getActionReceiptActions(
+    since_receipt_id: string,
+    limit = 100
+  ): Promise<ActionReceiptAction[]> {
+    return [
+      {
+        receipt_id: since_receipt_id,
+        index_in_action_receipt: 0,
+        action_kind: '',
+        args: '',
+        predecessor_id: '',
+        receiver_id: '',
+        timestamp: ''
       }
     ];
   }

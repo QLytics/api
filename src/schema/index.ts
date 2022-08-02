@@ -6,6 +6,12 @@ import {
   GetActionReceipts,
   NewActionReceiptType
 } from './action_receipt';
+import {
+  ActionReceiptAction,
+  ActionReceiptActionType,
+  GetActionReceiptActions,
+  NewActionReceiptActionType
+} from './action_receipt_action';
 import { Block, BlockType, GetBlocks, NewBlockType } from './block';
 import { Chunk, ChunkType, GetChunks, NewChunkType } from './chunk';
 import {
@@ -42,6 +48,7 @@ import {
 
 export {
   ActionReceipt,
+  ActionReceiptAction,
   Block,
   Chunk,
   GetChunks,
@@ -53,6 +60,7 @@ export {
   GetReceipts,
   GetDataReceipts,
   GetActionReceipts,
+  GetActionReceiptActions,
   Receipt,
   DataReceipt,
   ExecutionOutcome,
@@ -91,6 +99,9 @@ export const typeDefs = gql`
 
   ${ActionReceiptType}
   ${NewActionReceiptType}
+
+  ${ActionReceiptActionType}
+  ${NewActionReceiptActionType}
 
   ${ExecutionOutcomeType}
   ${NewExecutionOutcomeType}
