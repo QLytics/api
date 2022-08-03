@@ -3,6 +3,7 @@ import { DataSource } from 'apollo-datasource';
 import {
   ActionReceiptAction,
   ActionReceiptInputData,
+  ActionReceiptOutputData,
   Block,
   BlockData,
   Chunk,
@@ -268,6 +269,29 @@ export class Database extends DataSource {
       {
         data_id: since_data_id,
         receipt_id: ''
+      }
+    ];
+  }
+
+  public async getActionReceiptOutputData(
+    data_id: string
+  ): Promise<ActionReceiptOutputData> {
+    return {
+      data_id,
+      receipt_id: '',
+      receiver_id: ''
+    };
+  }
+
+  public async getActionReceiptOutputDatas(
+    since_data_id: string,
+    limit = 100
+  ): Promise<ActionReceiptOutputData[]> {
+    return [
+      {
+        data_id: since_data_id,
+        receipt_id: '',
+        receiver_id: ''
       }
     ];
   }

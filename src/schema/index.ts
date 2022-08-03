@@ -18,6 +18,12 @@ import {
   GetActionReceiptInputDatas,
   NewActionReceiptInputDataType
 } from './action_receipt_input_data';
+import {
+  ActionReceiptOutputData,
+  ActionReceiptOutputDataType,
+  GetActionReceiptOutputDatas,
+  NewActionReceiptOutputDataType
+} from './action_receipt_output_data';
 import { Block, BlockType, GetBlocks, NewBlockType } from './block';
 import { Chunk, ChunkType, GetChunks, NewChunkType } from './chunk';
 import {
@@ -56,6 +62,7 @@ export {
   ActionReceipt,
   ActionReceiptAction,
   ActionReceiptInputData,
+  ActionReceiptOutputData,
   Block,
   Chunk,
   GetChunks,
@@ -69,6 +76,7 @@ export {
   GetActionReceipts,
   GetActionReceiptActions,
   GetActionReceiptInputDatas,
+  GetActionReceiptOutputDatas,
   Receipt,
   DataReceipt,
   ExecutionOutcome,
@@ -84,6 +92,12 @@ export interface BlockData {
   transaction_actions: TransactionAction[];
   receipts: Receipt[];
   data_receipts: DataReceipt[];
+  action_receipts: ActionReceipt[];
+  action_receipt_actions: ActionReceiptAction[];
+  action_receipt_input_datas: ActionReceiptInputData[];
+  action_receipt_output_datas: ActionReceiptOutputData[];
+  execution_outcomes: ExecutionOutcome[];
+  execution_outcome_receipts: ExecutionOutcomeReceipt[];
 }
 
 export const typeDefs = gql`
@@ -114,6 +128,9 @@ export const typeDefs = gql`
   ${ActionReceiptInputDataType}
   ${NewActionReceiptInputDataType}
 
+  ${ActionReceiptOutputDataType}
+  ${NewActionReceiptOutputDataType}
+
   ${ExecutionOutcomeType}
   ${NewExecutionOutcomeType}
 
@@ -130,6 +147,7 @@ export const typeDefs = gql`
     action_receipts: [NewActionReceipt!]!
     action_receipt_actions: [NewActionReceiptAction!]!
     action_receipt_input_datas: [NewActionReceiptInputData!]!
+    action_receipt_output_datas: [NewActionReceiptOutputData!]!
     execution_outcomes: [NewExecutionOutcome!]!
     execution_outcome_receipts: [NewExecutionOutcomeReceipt!]!
   }
@@ -163,6 +181,11 @@ export const typeDefs = gql`
       since_data_id: ID!
       limit: Int = 100
     ): [ActionReceiptInputData]
+    actionReceiptOutputData(data_id: ID!): ActionReceiptOutputData
+    actionReceiptOutputDatas(
+      since_data_id: ID!
+      limit: Int = 100
+    ): [ActionReceiptOutputData]
     executionOutcome(receipt_id: ID!): ExecutionOutcome
     executionOutcomes(
       since_receipt_id: ID!
