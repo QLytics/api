@@ -2,6 +2,7 @@ import { DataSource } from 'apollo-datasource';
 
 import {
   Account,
+  AccountChange,
   ActionReceiptAction,
   ActionReceiptInputData,
   ActionReceiptOutputData,
@@ -381,12 +382,51 @@ export class Database extends DataSource {
 
   public async getAccounts(
     since_account_id: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<Account[]> {
     return [
       {
         account_id: since_account_id,
         last_update_block_height: ''
+      }
+    ];
+  }
+
+  public async getAccountChange(id: string): Promise<AccountChange> {
+    return {
+      id,
+      account_id: '',
+      timestamp: '',
+      block_hash: '',
+      transaction_hash: '',
+      receipt_id: '',
+      update_reason: '',
+      nonstaked_balance: '',
+      staked_balance: '',
+      storage_usage: '',
+      index_in_block: 0
+    };
+  }
+
+  public async getAccountChanges(
+    since_id: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    limit = 100
+  ): Promise<AccountChange[]> {
+    return [
+      {
+        id: since_id,
+        account_id: '',
+        timestamp: '',
+        block_hash: '',
+        transaction_hash: '',
+        receipt_id: '',
+        update_reason: '',
+        nonstaked_balance: '',
+        staked_balance: '',
+        storage_usage: '',
+        index_in_block: 0
       }
     ];
   }

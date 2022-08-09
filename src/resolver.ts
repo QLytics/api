@@ -3,6 +3,7 @@ import type { IExecutableSchemaDefinition } from '@graphql-tools/schema';
 import { Context } from './context';
 import {
   Account,
+  AccountChange,
   ActionReceipt,
   ActionReceiptAction,
   ActionReceiptInputData,
@@ -13,6 +14,7 @@ import {
   DataReceipt,
   ExecutionOutcome,
   ExecutionOutcomeReceipt,
+  GetAccountChanges,
   GetAccounts,
   GetActionReceiptActions,
   GetActionReceiptInputDatas,
@@ -218,6 +220,20 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
       { dataSources }: Context
     ) => {
       return dataSources.database.getAccounts(since_account_id, limit);
+    },
+    accountChange: async (
+      _: unknown,
+      { id }: AccountChange,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getAccountChange(id);
+    },
+    accountChanges: async (
+      _: unknown,
+      { since_id, limit }: GetAccountChanges,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getAccountChanges(since_id, limit);
     }
   },
   Mutation: {
@@ -233,7 +249,6 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
       { account_ids: accountIds }: { account_ids: string[] },
       { dataSources }: Context
     ) => {
-      console.log('DELETE', accountIds);
       return dataSources.database.deleteAccounts(accountIds);
     }
   }

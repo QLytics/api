@@ -2,6 +2,13 @@ import { gql } from 'apollo-server-cloudflare';
 
 import { Account, AccountType, GetAccounts, NewAccountType } from './account';
 import {
+  AccountChange,
+  AccountChangeType,
+  GetAccountChanges,
+  NewAccountChange,
+  NewAccountChangeType
+} from './account_change';
+import {
   ActionReceipt,
   ActionReceiptType,
   GetActionReceipts,
@@ -61,6 +68,7 @@ import {
 
 export {
   Account,
+  AccountChange,
   ActionReceipt,
   ActionReceiptAction,
   ActionReceiptInputData,
@@ -76,6 +84,7 @@ export {
   GetReceipts,
   GetDataReceipts,
   GetAccounts,
+  GetAccountChanges,
   GetActionReceipts,
   GetActionReceiptActions,
   GetActionReceiptInputDatas,
@@ -102,6 +111,7 @@ export interface BlockData {
   execution_outcomes: ExecutionOutcome[];
   execution_outcome_receipts: ExecutionOutcomeReceipt[];
   accounts: Account[];
+  account_changes: NewAccountChange[];
 }
 
 export const typeDefs = gql`
@@ -144,6 +154,9 @@ export const typeDefs = gql`
   ${AccountType}
   ${NewAccountType}
 
+  ${AccountChangeType}
+  ${NewAccountChangeType}
+
   input BlockData {
     block: NewBlock!
     chunks: [NewChunk!]!
@@ -158,6 +171,7 @@ export const typeDefs = gql`
     execution_outcomes: [NewExecutionOutcome!]!
     execution_outcome_receipts: [NewExecutionOutcomeReceipt!]!
     accounts: [NewAccount!]!
+    account_changes: [NewAccountChange!]!
   }
 
   type Mutation {
@@ -207,5 +221,7 @@ export const typeDefs = gql`
     ): [ExecutionOutcomeReceipt]
     account(account_id: ID!): Account
     accounts(since_account_id: ID!, limit: Int = 100): [Account]
+    accountChange(id: ID!): AccountChange
+    accountChanges(since_id: ID!, limit: Int = 100): [AccountChange]
   }
 `;
