@@ -1,6 +1,7 @@
 import { DataSource } from 'apollo-datasource';
 
 import {
+  Account,
   ActionReceiptAction,
   ActionReceiptInputData,
   ActionReceiptOutputData,
@@ -26,6 +27,11 @@ export class Database extends DataSource {
     return [];
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async deleteAccounts(accountIds: string[]): Promise<number> {
+    return 0;
+  }
+
   public async getBlock(hash: string): Promise<Block> {
     return {
       hash,
@@ -38,6 +44,7 @@ export class Database extends DataSource {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getBlocks(since_hash: string, limit = 100): Promise<Block[]> {
     return [
       {
@@ -64,6 +71,7 @@ export class Database extends DataSource {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getChunks(since_hash: string, limit = 100): Promise<Chunk[]> {
     return [
       {
@@ -99,6 +107,7 @@ export class Database extends DataSource {
 
   public async getTransactions(
     since_hash: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<Transaction[]> {
     return [
@@ -132,6 +141,7 @@ export class Database extends DataSource {
 
   public async getTransactionActions(
     since_hash: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<TransactionAction[]> {
     return [
@@ -160,6 +170,7 @@ export class Database extends DataSource {
 
   public async getReceipts(
     since_receipt_id: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<Receipt[]> {
     return [
@@ -187,6 +198,7 @@ export class Database extends DataSource {
 
   public async getDataReceipts(
     since_data_id: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<DataReceipt[]> {
     return [
@@ -209,6 +221,7 @@ export class Database extends DataSource {
 
   public async getActionReceipts(
     since_receipt_id: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<ActionReceipt[]> {
     return [
@@ -237,6 +250,7 @@ export class Database extends DataSource {
 
   public async getActionReceiptActions(
     since_receipt_id: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<ActionReceiptAction[]> {
     return [
@@ -263,6 +277,7 @@ export class Database extends DataSource {
 
   public async getActionReceiptInputDatas(
     since_data_id: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<ActionReceiptInputData[]> {
     return [
@@ -285,6 +300,7 @@ export class Database extends DataSource {
 
   public async getActionReceiptOutputDatas(
     since_data_id: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<ActionReceiptOutputData[]> {
     return [
@@ -314,6 +330,7 @@ export class Database extends DataSource {
 
   public async getExecutionOutcomes(
     since_receipt_id: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<ExecutionOutcome[]> {
     return [
@@ -343,6 +360,7 @@ export class Database extends DataSource {
 
   public async getExecutionOutcomeReceipts(
     since_receipt_id: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<ExecutionOutcomeReceipt[]> {
     return [
@@ -350,6 +368,25 @@ export class Database extends DataSource {
         receipt_id: since_receipt_id,
         index_in_execution_outcome: 0,
         produced_receipt_id: ''
+      }
+    ];
+  }
+
+  public async getAccount(account_id: string): Promise<Account> {
+    return {
+      account_id,
+      last_update_block_height: ''
+    };
+  }
+
+  public async getAccounts(
+    since_account_id: string,
+    limit = 100
+  ): Promise<Account[]> {
+    return [
+      {
+        account_id: since_account_id,
+        last_update_block_height: ''
       }
     ];
   }

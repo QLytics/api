@@ -1,5 +1,6 @@
 import { gql } from 'apollo-server-cloudflare';
 
+import { Account, AccountType, GetAccounts, NewAccountType } from './account';
 import {
   ActionReceipt,
   ActionReceiptType,
@@ -59,6 +60,7 @@ import {
 } from './transaction_action';
 
 export {
+  Account,
   ActionReceipt,
   ActionReceiptAction,
   ActionReceiptInputData,
@@ -73,6 +75,7 @@ export {
   GetTransactionActions,
   GetReceipts,
   GetDataReceipts,
+  GetAccounts,
   GetActionReceipts,
   GetActionReceiptActions,
   GetActionReceiptInputDatas,
@@ -98,6 +101,7 @@ export interface BlockData {
   action_receipt_output_datas: ActionReceiptOutputData[];
   execution_outcomes: ExecutionOutcome[];
   execution_outcome_receipts: ExecutionOutcomeReceipt[];
+  accounts: Account[];
 }
 
 export const typeDefs = gql`
@@ -137,6 +141,9 @@ export const typeDefs = gql`
   ${ExecutionOutcomeReceiptType}
   ${NewExecutionOutcomeReceiptType}
 
+  ${AccountType}
+  ${NewAccountType}
+
   input BlockData {
     block: NewBlock!
     chunks: [NewChunk!]!
@@ -150,10 +157,12 @@ export const typeDefs = gql`
     action_receipt_output_datas: [NewActionReceiptOutputData!]!
     execution_outcomes: [NewExecutionOutcome!]!
     execution_outcome_receipts: [NewExecutionOutcomeReceipt!]!
+    accounts: [NewAccount!]!
   }
 
   type Mutation {
     addBlockData(block_data: [BlockData!]!): [Block]
+    deleteAccounts(account_ids: [String!]!): Int
   }
 
   type Query {
@@ -196,5 +205,7 @@ export const typeDefs = gql`
       since_receipt_id: ID!
       limit: Int = 100
     ): [ExecutionOutcomeReceipt]
+    account(account_id: ID!): Account
+    accounts(since_account_id: ID!, limit: Int = 100): [Account]
   }
 `;
