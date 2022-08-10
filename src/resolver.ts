@@ -14,6 +14,7 @@ import {
   DataReceipt,
   ExecutionOutcome,
   ExecutionOutcomeReceipt,
+  GenesisBlockData,
   GetAccountChanges,
   GetAccounts,
   GetActionReceiptActions,
@@ -243,6 +244,13 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
       { dataSources }: Context
     ) => {
       return dataSources.database.addBlockData(blockData);
+    },
+    addGenesisBlockData: async (
+      _: unknown,
+      { block_data: blockData }: { block_data: GenesisBlockData[] },
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.addGenesisBlockData(blockData);
     },
     deleteAccounts: async (
       _: unknown,

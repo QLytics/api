@@ -114,6 +114,10 @@ export interface BlockData {
   account_changes: NewAccountChange[];
 }
 
+export interface GenesisBlockData {
+  accounts: Account[];
+}
+
 export const typeDefs = gql`
   ${BlockType}
   ${NewBlockType}
@@ -174,8 +178,13 @@ export const typeDefs = gql`
     account_changes: [NewAccountChange!]!
   }
 
+  input GenesisBlockData {
+    accounts: [NewAccount!]!
+  }
+
   type Mutation {
     addBlockData(block_data: [BlockData!]!): [Block]
+    addGenesisBlockData(block_data: [GenesisBlockData!]!): Int
     deleteAccounts(account_ids: [String!]!): Int
   }
 

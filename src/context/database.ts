@@ -12,6 +12,7 @@ import {
   DataReceipt,
   ExecutionOutcome,
   ExecutionOutcomeReceipt,
+  GenesisBlockData,
   Receipt,
   Transaction,
   TransactionAction
@@ -26,6 +27,13 @@ export class Database extends DataSource {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async addBlockData(blockData: BlockData[]): Promise<Block[]> {
     return [];
+  }
+
+  public async addGenesisBlockData(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    blockData: GenesisBlockData[]
+  ): Promise<number> {
+    return 0;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
