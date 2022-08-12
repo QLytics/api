@@ -2,6 +2,7 @@ import type { IExecutableSchemaDefinition } from '@graphql-tools/schema';
 
 import { Context } from './context';
 import {
+  AccessKey,
   Account,
   AccountChange,
   ActionReceipt,
@@ -15,6 +16,7 @@ import {
   ExecutionOutcome,
   ExecutionOutcomeReceipt,
   GenesisBlockData,
+  GetAccessKeys,
   GetAccountChanges,
   GetAccounts,
   GetActionReceiptActions,
@@ -235,6 +237,20 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
       { dataSources }: Context
     ) => {
       return dataSources.database.getAccountChanges(since_id, limit);
+    },
+    accessKey: async (
+      _: unknown,
+      { public_key }: AccessKey,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getAccessKey(public_key);
+    },
+    accessKeys: async (
+      _: unknown,
+      { since_public_key, limit }: GetAccessKeys,
+      { dataSources }: Context
+    ) => {
+      return dataSources.database.getAccessKeys(since_public_key, limit);
     }
   },
   Mutation: {

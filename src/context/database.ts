@@ -1,8 +1,10 @@
 import { DataSource } from 'apollo-datasource';
 
 import {
+  AccessKey,
   Account,
   AccountChange,
+  ActionReceipt,
   ActionReceiptAction,
   ActionReceiptInputData,
   ActionReceiptOutputData,
@@ -17,7 +19,6 @@ import {
   Transaction,
   TransactionAction
 } from '../schema';
-import { ActionReceipt } from '../schema/action_receipt';
 
 export class Database extends DataSource {
   constructor() {
@@ -435,6 +436,30 @@ export class Database extends DataSource {
         staked_balance: '',
         storage_usage: '',
         index_in_block: 0
+      }
+    ];
+  }
+
+  public async getAccessKey(public_key: string): Promise<AccessKey> {
+    return {
+      public_key,
+      account_id: '',
+      permission_kind: '',
+      last_update_block_height: ''
+    };
+  }
+
+  public async getAccessKeys(
+    since_public_key: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    limit = 100
+  ): Promise<AccessKey[]> {
+    return [
+      {
+        public_key: since_public_key,
+        account_id: '',
+        permission_kind: '',
+        last_update_block_height: ''
       }
     ];
   }

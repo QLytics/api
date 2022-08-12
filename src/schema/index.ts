@@ -1,5 +1,11 @@
 import { gql } from 'apollo-server-cloudflare';
 
+import {
+  AccessKey,
+  AccessKeyType,
+  GetAccessKeys,
+  NewAccessKeyType
+} from './access_key';
 import { Account, AccountType, GetAccounts, NewAccountType } from './account';
 import {
   AccountChange,
@@ -67,6 +73,7 @@ import {
 } from './transaction_action';
 
 export {
+  AccessKey,
   Account,
   AccountChange,
   ActionReceipt,
@@ -83,6 +90,7 @@ export {
   GetTransactionActions,
   GetReceipts,
   GetDataReceipts,
+  GetAccessKeys,
   GetAccounts,
   GetAccountChanges,
   GetActionReceipts,
@@ -112,10 +120,12 @@ export interface BlockData {
   execution_outcome_receipts: ExecutionOutcomeReceipt[];
   accounts: Account[];
   account_changes: NewAccountChange[];
+  access_keys: AccessKey[];
 }
 
 export interface GenesisBlockData {
   accounts: Account[];
+  access_keys: AccessKey[];
 }
 
 export const typeDefs = gql`
@@ -161,6 +171,9 @@ export const typeDefs = gql`
   ${AccountChangeType}
   ${NewAccountChangeType}
 
+  ${AccessKeyType}
+  ${NewAccessKeyType}
+
   input BlockData {
     block: NewBlock!
     chunks: [NewChunk!]!
@@ -176,10 +189,12 @@ export const typeDefs = gql`
     execution_outcome_receipts: [NewExecutionOutcomeReceipt!]!
     accounts: [NewAccount!]!
     account_changes: [NewAccountChange!]!
+    access_keys: [NewAccessKey!]!
   }
 
   input GenesisBlockData {
     accounts: [NewAccount!]!
+    access_keys: [NewAccessKey!]!
   }
 
   type Mutation {
@@ -232,5 +247,7 @@ export const typeDefs = gql`
     accounts(since_account_id: ID!, limit: Int = 100): [Account]
     accountChange(id: ID!): AccountChange
     accountChanges(since_id: ID!, limit: Int = 100): [AccountChange]
+    accessKey(public_key: ID!): AccessKey
+    accessKeys(since_public_key: ID!, limit: Int = 100): [AccessKey]
   }
 `;
