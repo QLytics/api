@@ -7,7 +7,7 @@ export interface DataReceipt {
 }
 
 export interface GetDataReceipts {
-  since_data_id: string;
+  since_data_id?: string;
   limit?: number;
 }
 

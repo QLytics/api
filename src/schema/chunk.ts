@@ -11,7 +11,7 @@ export interface Chunk {
 }
 
 export interface GetChunks {
-  since_hash: string;
+  since_hash?: string;
   limit?: number;
 }
 

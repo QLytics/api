@@ -7,7 +7,7 @@ export interface ExecutionOutcomeReceipt {
 }
 
 export interface GetExecutionOutcomeReceipts {
-  since_receipt_id: string;
+  since_receipt_id?: string;
   limit?: number;
 }
 

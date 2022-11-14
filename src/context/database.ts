@@ -73,9 +73,9 @@ export class Database extends DataSource {
   public async getBlock(hash: string): Promise<Block> {
     return {
       hash,
-      height: '',
+      height: 0,
       prev_hash: '',
-      timestamp: '',
+      timestamp: 0,
       total_supply: '',
       gas_price: '',
       author_account_id: ''
@@ -83,9 +83,23 @@ export class Database extends DataSource {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async getBlocks(since_hash: string, limit = 100): Promise<Block[]> {
-    const res = await this.env.DB.prepare('SELECT * FROM blocks LIMIT ?1')
-      .bind(limit)
+  public async getBlocks(since_hash?: string, limit = 100): Promise<Block[]> {
+    let rowid = 0;
+    if (since_hash != null) {
+      try {
+        rowid = (
+          await this.env.DB.prepare('SELECT rowid FROM blocks WHERE hash = ?1')
+            .bind(since_hash)
+            .first<{ rowid: number }>()
+        ).rowid;
+      } catch (err) {
+        // ignore
+      }
+    }
+    const res = await this.env.DB.prepare(
+      'SELECT * FROM blocks WHERE rowid > ?1 LIMIT ?2'
+    )
+      .bind(rowid, limit)
       .all<Block>();
     return res.results ?? [];
   }
@@ -123,7 +137,7 @@ export class Database extends DataSource {
       block_hash: '',
       chunk_hash: '',
       chunk_index: 0,
-      timestamp: '',
+      timestamp: 0,
       signer_id: '',
       public_key: '',
       nonce: '',
@@ -137,17 +151,17 @@ export class Database extends DataSource {
   }
 
   public async getTransactions(
-    since_hash: string,
+    since_hash?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<Transaction[]> {
     return [
       {
-        hash: since_hash,
+        hash: '',
         block_hash: '',
         chunk_hash: '',
         chunk_index: 0,
-        timestamp: '',
+        timestamp: 0,
         signer_id: '',
         public_key: '',
         nonce: '',
@@ -171,13 +185,13 @@ export class Database extends DataSource {
   }
 
   public async getTransactionActions(
-    since_hash: string,
+    since_hash?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<TransactionAction[]> {
     return [
       {
-        hash: since_hash,
+        hash: '',
         transaction_index: 0,
         action_kind: '',
         args: ''
@@ -191,7 +205,7 @@ export class Database extends DataSource {
       block_hash: '',
       chunk_hash: '',
       chunk_index: 0,
-      timestamp: '',
+      timestamp: 0,
       predecessor_id: '',
       receiver_id: '',
       receipt_kind: '',
@@ -200,17 +214,17 @@ export class Database extends DataSource {
   }
 
   public async getReceipts(
-    since_receipt_id: string,
+    since_receipt_id?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<Receipt[]> {
     return [
       {
-        receipt_id: since_receipt_id,
+        receipt_id: '',
         block_hash: '',
         chunk_hash: '',
         chunk_index: 0,
-        timestamp: '',
+        timestamp: 0,
         predecessor_id: '',
         receiver_id: '',
         receipt_kind: '',
@@ -228,13 +242,13 @@ export class Database extends DataSource {
   }
 
   public async getDataReceipts(
-    since_data_id: string,
+    since_data_id?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<DataReceipt[]> {
     return [
       {
-        data_id: since_data_id,
+        data_id: '',
         receipt_id: '',
         data_base64: ''
       }
@@ -251,13 +265,13 @@ export class Database extends DataSource {
   }
 
   public async getActionReceipts(
-    since_receipt_id: string,
+    since_receipt_id?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<ActionReceipt[]> {
     return [
       {
-        receipt_id: since_receipt_id,
+        receipt_id: '',
         signer_account_id: '',
         signer_public_key: '',
         gas_price: ''
@@ -275,24 +289,24 @@ export class Database extends DataSource {
       args: '',
       predecessor_id: '',
       receiver_id: '',
-      timestamp: ''
+      timestamp: 0
     };
   }
 
   public async getActionReceiptActions(
-    since_receipt_id: string,
+    since_receipt_id?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<ActionReceiptAction[]> {
     return [
       {
-        receipt_id: since_receipt_id,
+        receipt_id: '',
         index_in_action_receipt: 0,
         action_kind: '',
         args: '',
         predecessor_id: '',
         receiver_id: '',
-        timestamp: ''
+        timestamp: 0
       }
     ];
   }
@@ -307,13 +321,13 @@ export class Database extends DataSource {
   }
 
   public async getActionReceiptInputDatas(
-    since_data_id: string,
+    since_data_id?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<ActionReceiptInputData[]> {
     return [
       {
-        data_id: since_data_id,
+        data_id: '',
         receipt_id: ''
       }
     ];
@@ -330,13 +344,13 @@ export class Database extends DataSource {
   }
 
   public async getActionReceiptOutputDatas(
-    since_data_id: string,
+    since_data_id?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<ActionReceiptOutputData[]> {
     return [
       {
-        data_id: since_data_id,
+        data_id: '',
         receipt_id: '',
         receiver_id: ''
       }
@@ -350,7 +364,7 @@ export class Database extends DataSource {
       receipt_id,
       block_hash: '',
       chunk_index: 0,
-      timestamp: '',
+      timestamp: 0,
       gas_burnt: '',
       tokens_burnt: '',
       account_id: '',
@@ -360,16 +374,16 @@ export class Database extends DataSource {
   }
 
   public async getExecutionOutcomes(
-    since_receipt_id: string,
+    since_receipt_id?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<ExecutionOutcome[]> {
     return [
       {
-        receipt_id: since_receipt_id,
+        receipt_id: '',
         block_hash: '',
         chunk_index: 0,
-        timestamp: '',
+        timestamp: 0,
         gas_burnt: '',
         tokens_burnt: '',
         account_id: '',
@@ -390,13 +404,13 @@ export class Database extends DataSource {
   }
 
   public async getExecutionOutcomeReceipts(
-    since_receipt_id: string,
+    since_receipt_id?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<ExecutionOutcomeReceipt[]> {
     return [
       {
-        receipt_id: since_receipt_id,
+        receipt_id: '',
         index_in_execution_outcome: 0,
         produced_receipt_id: ''
       }
@@ -406,19 +420,19 @@ export class Database extends DataSource {
   public async getAccount(account_id: string): Promise<Account> {
     return {
       account_id,
-      last_update_block_height: ''
+      last_update_block_height: 0
     };
   }
 
   public async getAccounts(
-    since_account_id: string,
+    since_account_id?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<Account[]> {
     return [
       {
-        account_id: since_account_id,
-        last_update_block_height: ''
+        account_id: '',
+        last_update_block_height: 0
       }
     ];
   }
@@ -427,7 +441,7 @@ export class Database extends DataSource {
     return {
       id,
       account_id: '',
-      timestamp: '',
+      timestamp: 0,
       block_hash: '',
       transaction_hash: '',
       receipt_id: '',
@@ -440,15 +454,15 @@ export class Database extends DataSource {
   }
 
   public async getAccountChanges(
-    since_id: string,
+    since_id?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<AccountChange[]> {
     return [
       {
-        id: since_id,
+        id: '',
         account_id: '',
-        timestamp: '',
+        timestamp: 0,
         block_hash: '',
         transaction_hash: '',
         receipt_id: '',
@@ -466,21 +480,21 @@ export class Database extends DataSource {
       public_key,
       account_id: '',
       permission_kind: '',
-      last_update_block_height: ''
+      last_update_block_height: 0
     };
   }
 
   public async getAccessKeys(
-    since_public_key: string,
+    since_public_key?: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<AccessKey[]> {
     return [
       {
-        public_key: since_public_key,
+        public_key: '',
         account_id: '',
         permission_kind: '',
-        last_update_block_height: ''
+        last_update_block_height: 0
       }
     ];
   }

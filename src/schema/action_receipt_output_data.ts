@@ -7,7 +7,7 @@ export interface ActionReceiptOutputData {
 }
 
 export interface GetActionReceiptOutputDatas {
-  since_data_id: string;
+  since_data_id?: string;
   limit?: number;
 }
 

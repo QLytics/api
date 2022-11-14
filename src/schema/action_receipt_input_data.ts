@@ -6,7 +6,7 @@ export interface ActionReceiptInputData {
 }
 
 export interface GetActionReceiptInputDatas {
-  since_data_id: string;
+  since_data_id?: string;
   limit?: number;
 }
 

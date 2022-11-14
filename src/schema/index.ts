@@ -205,49 +205,49 @@ export const typeDefs = gql`
 
   type Query {
     block(hash: ID!): Block
-    blocks(since_hash: ID!, limit: Int = 100): [Block]
+    blocks(since_hash: ID, limit: Int = 100): [Block]
     chunk(hash: ID!): Chunk
-    chunks(since_hash: ID!, limit: Int = 100): [Chunk]
+    chunks(since_hash: ID, limit: Int = 100): [Chunk]
     transaction(hash: ID!): Transaction
-    transactions(since_hash: ID!, limit: Int = 100): [Transaction]
+    transactions(since_hash: ID, limit: Int = 100): [Transaction]
     transactionAction(hash: ID!): TransactionAction
-    transactionActions(since_hash: ID!, limit: Int = 100): [TransactionAction]
+    transactionActions(since_hash: ID, limit: Int = 100): [TransactionAction]
     receipt(receipt_id: ID!): Receipt
-    receipts(since_receipt_id: ID!, limit: Int = 100): [Receipt]
+    receipts(since_receipt_id: ID, limit: Int = 100): [Receipt]
     dataReceipt(data_id: ID!): DataReceipt
-    dataReceipts(since_data_id: ID!, limit: Int = 100): [DataReceipt]
+    dataReceipts(since_data_id: ID, limit: Int = 100): [DataReceipt]
     actionReceipt(receipt_id: ID!): ActionReceipt
-    actionReceipts(since_receipt_id: ID!, limit: Int = 100): [ActionReceipt]
+    actionReceipts(since_receipt_id: ID, limit: Int = 100): [ActionReceipt]
     actionReceiptAction(receipt_id: ID!): ActionReceiptAction
     actionReceiptActions(
-      since_receipt_id: ID!
+      since_receipt_id: ID
       limit: Int = 100
     ): [ActionReceiptAction]
     actionReceiptInputData(data_id: ID!): ActionReceiptInputData
     actionReceiptInputDatas(
-      since_data_id: ID!
+      since_data_id: ID
       limit: Int = 100
     ): [ActionReceiptInputData]
     actionReceiptOutputData(data_id: ID!): ActionReceiptOutputData
     actionReceiptOutputDatas(
-      since_data_id: ID!
+      since_data_id: ID
       limit: Int = 100
     ): [ActionReceiptOutputData]
     executionOutcome(receipt_id: ID!): ExecutionOutcome
     executionOutcomes(
-      since_receipt_id: ID!
+      since_receipt_id: ID
       limit: Int = 100
     ): [ExecutionOutcome]
     executionOutcomeReceipt(receipt_id: ID!): ExecutionOutcomeReceipt
     executionOutcomeReceipts(
-      since_receipt_id: ID!
+      since_receipt_id: ID
       limit: Int = 100
     ): [ExecutionOutcomeReceipt]
     account(account_id: ID!): Account
-    accounts(since_account_id: ID!, limit: Int = 100): [Account]
+    accounts(since_account_id: ID, limit: Int = 100): [Account]
     accountChange(id: ID!): AccountChange
-    accountChanges(since_id: ID!, limit: Int = 100): [AccountChange]
+    accountChanges(since_id: ID, limit: Int = 100): [AccountChange]
     accessKey(public_key: ID!): AccessKey
-    accessKeys(since_public_key: ID!, limit: Int = 100): [AccessKey]
+    accessKeys(since_public_key: ID, limit: Int = 100): [AccessKey]
   }
 `;

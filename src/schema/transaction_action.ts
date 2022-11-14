@@ -8,7 +8,7 @@ export interface TransactionAction {
 }
 
 export interface GetTransactionActions {
-  since_hash: string;
+  since_hash?: string;
   limit?: number;
 }
 

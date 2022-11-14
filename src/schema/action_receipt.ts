@@ -8,7 +8,7 @@ export interface ActionReceipt {
 }
 
 export interface GetActionReceipts {
-  since_receipt_id: string;
+  since_receipt_id?: string;
   limit?: number;
 }
 

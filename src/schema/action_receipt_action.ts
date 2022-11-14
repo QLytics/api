@@ -7,11 +7,11 @@ export interface ActionReceiptAction {
   args: string;
   predecessor_id: string;
   receiver_id: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 export interface GetActionReceiptActions {
-  since_receipt_id: string;
+  since_receipt_id?: string;
   limit?: number;
 }
 
@@ -23,7 +23,7 @@ export const ActionReceiptActionType = gql`
     args: String!
     predecessor_id: String!
     receiver_id: String!
-    timestamp: String!
+    timestamp: Int!
   }
 `;
 
@@ -35,6 +35,6 @@ export const NewActionReceiptActionType = gql`
     args: String!
     predecessor_id: String!
     receiver_id: String!
-    timestamp: String!
+    timestamp: Int!
   }
 `;

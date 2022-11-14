@@ -5,7 +5,7 @@ export interface Receipt {
   block_hash: string;
   chunk_hash: string;
   chunk_index: number;
-  timestamp: string;
+  timestamp: number;
   predecessor_id: string;
   receiver_id: string;
   receipt_kind: string;
@@ -13,7 +13,7 @@ export interface Receipt {
 }
 
 export interface GetReceipts {
-  since_receipt_id: string;
+  since_receipt_id?: string;
   limit?: number;
 }
 
@@ -23,7 +23,7 @@ export const ReceiptType = gql`
     block_hash: String!
     chunk_hash: String!
     chunk_index: Int!
-    timestamp: String!
+    timestamp: Int!
     predecessor_id: String!
     receiver_id: String!
     receipt_kind: String!
@@ -37,7 +37,7 @@ export const NewReceiptType = gql`
     block_hash: String!
     chunk_hash: String!
     chunk_index: Int!
-    timestamp: String!
+    timestamp: Int!
     predecessor_id: String!
     receiver_id: String!
     receipt_kind: String!
