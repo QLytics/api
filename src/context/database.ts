@@ -38,10 +38,21 @@ export class Database extends DataSource {
       author_account_id
     ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`
     );
+    const chunkPrepare = this.env.DB.prepare(
+      `INSERT INTO chunks (
+        hash,
+        block_hash,
+        shard_id,
+        signature,
+        gas_limit,
+        gas_used,
+        author_account_id
+      ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`
+    );
     const queries = [];
 
     for (const data of blockData) {
-      const { block } = data;
+      const { block, chunks } = data;
       queries.push(
         blockPrepare.bind(
           block.hash,
@@ -53,6 +64,20 @@ export class Database extends DataSource {
           block.author_account_id
         )
       );
+      console.log('CHUNKS', chunks);
+      for (const chunk of chunks) {
+        queries.push(
+          chunkPrepare.bind(
+            chunk.hash,
+            chunk.block_hash,
+            chunk.shard_id,
+            chunk.signature,
+            chunk.gas_limit,
+            chunk.gas_used,
+            chunk.author_account_id
+          )
+        );
+      }
     }
     const res = await this.env.DB.batch<Block>(queries);
     return res.length;
@@ -71,15 +96,12 @@ export class Database extends DataSource {
   }
 
   public async getBlock(hash: string): Promise<Block> {
-    return {
-      hash,
-      height: '',
-      prev_hash: '',
-      timestamp: '',
-      total_supply: '',
-      gas_price: '',
-      author_account_id: ''
-    };
+    const block = await this.env.DB.prepare(
+      'SELECT * FROM blocks WHERE hash = ?1'
+    )
+      .bind(hash)
+      .first<Block>();
+    return block;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -106,30 +128,36 @@ export class Database extends DataSource {
   }
 
   public async getChunk(hash: string): Promise<Chunk> {
-    return {
-      hash,
-      block_hash: '',
-      shard_id: '',
-      signature: '',
-      gas_used: '',
-      gas_limit: '',
-      author_account_id: ''
-    };
+    const chunk = await this.env.DB.prepare(
+      'SELECT * FROM chunks WHERE hash = ?1'
+    )
+      .bind(hash)
+      .first<Chunk>();
+    return chunk;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async getChunks(since_hash: string, limit = 100): Promise<Chunk[]> {
-    return [
-      {
-        hash: since_hash,
-        block_hash: '',
-        shard_id: '',
-        signature: '',
-        gas_used: '',
-        gas_limit: '',
-        author_account_id: ''
+  public async getChunks(since_hash?: string, limit = 100): Promise<Chunk[]> {
+    let rowid = 0;
+    if (since_hash != null) {
+      try {
+        rowid = (
+          await this.env.DB.prepare('SELECT rowid FROM chunks WHERE hash = ?1')
+            .bind(since_hash)
+            .first<{ rowid: number }>()
+        ).rowid;
+      } catch (err) {
+        console.error(err);
+        // ignore
       }
-    ];
+    }
+    const res = await this.env.DB.prepare(
+      'SELECT * FROM chunks WHERE rowid > ?1 LIMIT ?2'
+    )
+      .bind(rowid, limit)
+      .all<Chunk>();
+    console.log('CHUNKS', res);
+    return res.results ?? [];
   }
 
   public async getTransaction(hash: string): Promise<Transaction> {

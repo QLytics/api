@@ -1,11 +1,11 @@
 DROP TABLE IF EXISTS blocks;
 CREATE TABLE blocks (
-  hash TEXT,
-  height INTEGER,
-  prev_hash TEXT,
-  timestamp INTEGER,
-  total_supply TEXT,
-  gas_price TEXT,
-  author_account_id TEXT
+  hash TEXT NOT NULL,
+  height INTEGER NOT NULL,
+  prev_hash TEXT NOT NULL,
+  timestamp INTEGER NOT NULL,
+  total_supply TEXT NOT NULL,
+  gas_price TEXT NOT NULL,
+  author_account_id TEXT NOT NULL
 );
-CREATE UNIQUE INDEX hash ON blocks(hash);
+CREATE UNIQUE INDEX block_hash ON blocks(hash);

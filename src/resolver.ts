@@ -56,7 +56,7 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
       { since_hash, limit }: GetChunks,
       { dataSources }: Context
     ) => {
-      return dataSources.database.getBlocks(since_hash, limit);
+      return dataSources.database.getChunks(since_hash, limit);
     },
     transaction: async (
       _: unknown,
