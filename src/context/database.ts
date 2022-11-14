@@ -73,9 +73,9 @@ export class Database extends DataSource {
   public async getBlock(hash: string): Promise<Block> {
     return {
       hash,
-      height: 0,
+      height: '',
       prev_hash: '',
-      timestamp: 0,
+      timestamp: '',
       total_supply: '',
       gas_price: '',
       author_account_id: ''
@@ -93,6 +93,7 @@ export class Database extends DataSource {
             .first<{ rowid: number }>()
         ).rowid;
       } catch (err) {
+        console.error(err);
         // ignore
       }
     }
@@ -137,7 +138,7 @@ export class Database extends DataSource {
       block_hash: '',
       chunk_hash: '',
       chunk_index: 0,
-      timestamp: 0,
+      timestamp: '',
       signer_id: '',
       public_key: '',
       nonce: '',
@@ -161,7 +162,7 @@ export class Database extends DataSource {
         block_hash: '',
         chunk_hash: '',
         chunk_index: 0,
-        timestamp: 0,
+        timestamp: '',
         signer_id: '',
         public_key: '',
         nonce: '',
@@ -205,7 +206,7 @@ export class Database extends DataSource {
       block_hash: '',
       chunk_hash: '',
       chunk_index: 0,
-      timestamp: 0,
+      timestamp: '',
       predecessor_id: '',
       receiver_id: '',
       receipt_kind: '',
@@ -224,7 +225,7 @@ export class Database extends DataSource {
         block_hash: '',
         chunk_hash: '',
         chunk_index: 0,
-        timestamp: 0,
+        timestamp: '',
         predecessor_id: '',
         receiver_id: '',
         receipt_kind: '',
@@ -289,7 +290,7 @@ export class Database extends DataSource {
       args: '',
       predecessor_id: '',
       receiver_id: '',
-      timestamp: 0
+      timestamp: ''
     };
   }
 
@@ -306,7 +307,7 @@ export class Database extends DataSource {
         args: '',
         predecessor_id: '',
         receiver_id: '',
-        timestamp: 0
+        timestamp: ''
       }
     ];
   }
@@ -364,7 +365,7 @@ export class Database extends DataSource {
       receipt_id,
       block_hash: '',
       chunk_index: 0,
-      timestamp: 0,
+      timestamp: '',
       gas_burnt: '',
       tokens_burnt: '',
       account_id: '',
@@ -383,7 +384,7 @@ export class Database extends DataSource {
         receipt_id: '',
         block_hash: '',
         chunk_index: 0,
-        timestamp: 0,
+        timestamp: '',
         gas_burnt: '',
         tokens_burnt: '',
         account_id: '',
@@ -420,7 +421,7 @@ export class Database extends DataSource {
   public async getAccount(account_id: string): Promise<Account> {
     return {
       account_id,
-      last_update_block_height: 0
+      last_update_block_height: ''
     };
   }
 
@@ -432,7 +433,7 @@ export class Database extends DataSource {
     return [
       {
         account_id: '',
-        last_update_block_height: 0
+        last_update_block_height: ''
       }
     ];
   }
@@ -441,7 +442,7 @@ export class Database extends DataSource {
     return {
       id,
       account_id: '',
-      timestamp: 0,
+      timestamp: '',
       block_hash: '',
       transaction_hash: '',
       receipt_id: '',
@@ -462,7 +463,7 @@ export class Database extends DataSource {
       {
         id: '',
         account_id: '',
-        timestamp: 0,
+        timestamp: '',
         block_hash: '',
         transaction_hash: '',
         receipt_id: '',
@@ -480,7 +481,7 @@ export class Database extends DataSource {
       public_key,
       account_id: '',
       permission_kind: '',
-      last_update_block_height: 0
+      last_update_block_height: ''
     };
   }
 
@@ -494,7 +495,7 @@ export class Database extends DataSource {
         public_key: '',
         account_id: '',
         permission_kind: '',
-        last_update_block_height: 0
+        last_update_block_height: ''
       }
     ];
   }

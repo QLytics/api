@@ -5,7 +5,7 @@ export interface Transaction {
   block_hash: string;
   chunk_hash: string;
   chunk_index: number;
-  timestamp: number;
+  timestamp: string;
   signer_id: string;
   public_key: string;
   nonce: string;
@@ -28,7 +28,7 @@ export const TransactionType = gql`
     block_hash: String!
     chunk_hash: String!
     chunk_index: Int!
-    timestamp: Int!
+    timestamp: String!
     signer_id: String!
     public_key: String!
     nonce: String!
@@ -47,7 +47,7 @@ export const NewTransactionType = gql`
     block_hash: String!
     chunk_hash: String!
     chunk_index: Int!
-    timestamp: Int!
+    timestamp: String!
     signer_id: String!
     public_key: String!
     nonce: String!

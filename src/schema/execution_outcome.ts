@@ -4,7 +4,7 @@ export interface ExecutionOutcome {
   receipt_id: string;
   block_hash: string;
   chunk_index: number;
-  timestamp: number;
+  timestamp: string;
   gas_burnt: string;
   tokens_burnt: string;
   account_id: string;
@@ -22,7 +22,7 @@ export const ExecutionOutcomeType = gql`
     receipt_id: String!
     block_hash: String!
     chunk_index: Int!
-    timestamp: Int!
+    timestamp: String!
     gas_burnt: String!
     tokens_burnt: String!
     account_id: String!
@@ -36,7 +36,7 @@ export const NewExecutionOutcomeType = gql`
     receipt_id: String!
     block_hash: String!
     chunk_index: Int!
-    timestamp: Int!
+    timestamp: String!
     gas_burnt: String!
     tokens_burnt: String!
     account_id: String!

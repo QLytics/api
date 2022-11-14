@@ -6,7 +6,7 @@ export interface AccessKey {
   created_by_receipt_id?: string;
   deleted_by_receipt_id?: string;
   permission_kind: string;
-  last_update_block_height: number;
+  last_update_block_height: string;
 }
 
 export interface GetAccessKeys {
@@ -21,7 +21,7 @@ export const AccessKeyType = gql`
     created_by_receipt_id: String
     deleted_by_receipt_id: String
     permission_kind: String!
-    last_update_block_height: Int!
+    last_update_block_height: String!
   }
 `;
 
@@ -32,6 +32,6 @@ export const NewAccessKeyType = gql`
     created_by_receipt_id: String
     deleted_by_receipt_id: String
     permission_kind: String!
-    last_update_block_height: Int!
+    last_update_block_height: String!
   }
 `;

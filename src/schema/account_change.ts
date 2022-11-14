@@ -3,7 +3,7 @@ import { gql } from 'apollo-server-cloudflare';
 export interface AccountChange {
   id: string;
   account_id: string;
-  timestamp: number;
+  timestamp: string;
   block_hash: string;
   transaction_hash: string;
   receipt_id: string;
@@ -36,7 +36,7 @@ export const AccountChangeType = gql`
   type AccountChange {
     id: ID!
     account_id: String!
-    timestamp: Int!
+    timestamp: String!
     block_hash: String!
     transaction_hash: String
     receipt_id: String
@@ -51,7 +51,7 @@ export const AccountChangeType = gql`
 export const NewAccountChangeType = gql`
   input NewAccountChange {
     account_id: String!
-    timestamp: Int!
+    timestamp: String!
     block_hash: String!
     transaction_hash: String
     receipt_id: String

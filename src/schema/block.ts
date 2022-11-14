@@ -2,9 +2,9 @@ import { gql } from 'apollo-server-cloudflare';
 
 export interface Block {
   hash: string;
-  height: number;
+  height: string;
   prev_hash: string;
-  timestamp: number;
+  timestamp: string;
   total_supply: string;
   gas_price: string;
   author_account_id: string;
@@ -18,9 +18,9 @@ export interface GetBlocks {
 export const BlockType = gql`
   type Block {
     hash: ID!
-    height: Int!
+    height: String!
     prev_hash: String!
-    timestamp: Int!
+    timestamp: String!
     total_supply: String!
     gas_price: String!
     author_account_id: String!
@@ -30,9 +30,9 @@ export const BlockType = gql`
 export const NewBlockType = gql`
   input NewBlock {
     hash: ID!
-    height: Int!
+    height: String!
     prev_hash: String!
-    timestamp: Int!
+    timestamp: String!
     total_supply: String!
     gas_price: String!
     author_account_id: String!

@@ -17,6 +17,8 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3",
+    "@databases/split-sql-query": "^1",
+    "@databases/sql": "^3",
     "@graphql-tools/schema": "^9",
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5",

@@ -4,7 +4,7 @@ export interface Account {
   account_id: string;
   created_by_receipt_id?: string;
   deleted_by_receipt_id?: string;
-  last_update_block_height: number;
+  last_update_block_height: string;
 }
 
 export interface GetAccounts {
@@ -17,7 +17,7 @@ export const AccountType = gql`
     account_id: ID!
     created_by_receipt_id: String
     deleted_by_receipt_id: String
-    last_update_block_height: Int!
+    last_update_block_height: String!
   }
 `;
 
@@ -26,6 +26,6 @@ export const NewAccountType = gql`
     account_id: ID!
     created_by_receipt_id: String
     deleted_by_receipt_id: String
-    last_update_block_height: Int!
+    last_update_block_height: String!
   }
 `;
