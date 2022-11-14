@@ -8,7 +8,7 @@ import { resolvers } from './resolver';
 import { typeDefs } from './schema';
 
 export default {
-  async fetch(request: Request): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     if (request.method === 'OPTIONS') {
       const response = new Response('', { status: 204 });
       setupCORS(request, response);
@@ -20,7 +20,7 @@ export default {
         const response = playground();
         return response;
       } else {
-        const response = await graphQLServer(request);
+        const response = await graphQLServer(request, env);
         setupCORS(request, response);
         return response;
       }
@@ -47,17 +47,17 @@ function setupCORS(request: Request, response: Response) {
   }
 }
 
-const createServer = () =>
+const createServer = (env: Env) =>
   new ApolloServer({
     typeDefs,
     resolvers,
     introspection: true,
-    dataSources,
+    dataSources: dataSources(env),
     cache: 'bounded'
   });
 
-const graphQLServer = async (request: Request) => {
-  const server = createServer();
+const graphQLServer = async (request: Request, env: Env) => {
+  const server = createServer(env);
   await server.start();
   return graphqlCloudflare(() => server.createGraphQLServerOptions(request))(
     request

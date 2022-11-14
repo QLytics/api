@@ -6,6 +6,6 @@ export interface Context {
   };
 }
 
-export const dataSources = () => ({
-  database: new Database()
+export const dataSources = (env: Env) => () => ({
+  database: new Database(env)
 });

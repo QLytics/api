@@ -198,7 +198,7 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    addBlockData(block_data: [BlockData!]!): [Block]
+    addBlockData(block_data: [BlockData!]!): Int
     addGenesisBlockData(block_data: [GenesisBlockData!]!): Int
     deleteAccounts(account_ids: [String!]!): Int
   }

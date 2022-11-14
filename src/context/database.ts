@@ -21,13 +21,41 @@ import {
 } from '../schema';
 
 export class Database extends DataSource {
-  constructor() {
+  constructor(private env: Env) {
     super();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async addBlockData(blockData: BlockData[]): Promise<Block[]> {
-    return [];
+  public async addBlockData(blockData: BlockData[]): Promise<number> {
+    const blockPrepare = this.env.DB.prepare(
+      `INSERT INTO blocks (
+      hash,
+      height,
+      prev_hash,
+      timestamp,
+      total_supply,
+      gas_price,
+      author_account_id
+    ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`
+    );
+    const queries = [];
+
+    for (const data of blockData) {
+      const { block } = data;
+      queries.push(
+        blockPrepare.bind(
+          block.hash,
+          block.height,
+          block.prev_hash,
+          block.timestamp,
+          block.total_supply,
+          block.gas_price,
+          block.author_account_id
+        )
+      );
+    }
+    const res = await this.env.DB.batch<Block>(queries);
+    return res.length;
   }
 
   public async addGenesisBlockData(
@@ -56,17 +84,10 @@ export class Database extends DataSource {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getBlocks(since_hash: string, limit = 100): Promise<Block[]> {
-    return [
-      {
-        hash: since_hash,
-        height: '',
-        prev_hash: '',
-        timestamp: '',
-        total_supply: '',
-        gas_price: '',
-        author_account_id: ''
-      }
-    ];
+    const res = await this.env.DB.prepare('SELECT * FROM blocks LIMIT ?1')
+      .bind(limit)
+      .all<Block>();
+    return res.results ?? [];
   }
 
   public async getChunk(hash: string): Promise<Chunk> {

@@ -5,9 +5,16 @@ main = "src/index.ts"
 node_compat = true
 usage_model = "bundled"
 
+[[ d1_databases ]]
+binding = "DB"
+database_name = "near"
+database_id = "c4c0793d-e3b1-468d-90e6-dd89dd1e05cc"
 
 [env.production]
 workers_dev = false
 routes = [
   "api.qlytics.dev/*"
+]
+d1_databases = [
+  { binding = "DB", database_name = "near", database_id = "c4c0793d-e3b1-468d-90e6-dd89dd1e05cc" },
 ]
