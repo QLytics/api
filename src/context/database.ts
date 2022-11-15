@@ -75,10 +75,24 @@ export class Database extends DataSource {
         args
       ) VALUES (?1, ?2, ?3, ?4)`
     );
+    const receiptPrepare = this.env.DB.prepare(
+      `INSERT INTO receipts (
+        receipt_id,
+        block_hash,
+        chunk_hash,
+        chunk_index,
+        timestamp,
+        predecessor_id,
+        receiver_id,
+        receipt_kind,
+        transaction_hash
+      ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)`
+    );
     const queries = [];
 
     for (const data of blockData) {
-      const { block, chunks, transactions, transaction_actions } = data;
+      const { block, chunks, transactions, transaction_actions, receipts } =
+        data;
 
       queries.push(
         blockPrepare.bind(
@@ -107,7 +121,6 @@ export class Database extends DataSource {
       }
 
       for (const transaction of transactions) {
-        console.log('transaction', transaction);
         queries.push(
           transactionPrepare.bind(
             transaction.hash,
@@ -135,6 +148,22 @@ export class Database extends DataSource {
             transactionAction.transaction_index,
             transactionAction.action_kind,
             transactionAction.args
+          )
+        );
+      }
+
+      for (const receipt of receipts) {
+        queries.push(
+          receiptPrepare.bind(
+            receipt.receipt_id,
+            receipt.block_hash,
+            receipt.chunk_hash,
+            receipt.chunk_index,
+            receipt.timestamp,
+            receipt.predecessor_id,
+            receipt.receiver_id,
+            receipt.receipt_kind,
+            receipt.transaction_hash
           )
         );
       }
@@ -294,17 +323,12 @@ export class Database extends DataSource {
   }
 
   public async getReceipt(receipt_id: string): Promise<Receipt> {
-    return {
-      receipt_id,
-      block_hash: '',
-      chunk_hash: '',
-      chunk_index: 0,
-      timestamp: '',
-      predecessor_id: '',
-      receiver_id: '',
-      receipt_kind: '',
-      transaction_hash: ''
-    };
+    const receipt = await this.env.DB.prepare(
+      'SELECT * FROM receipts WHERE receipt_id = ?1'
+    )
+      .bind(receipt_id)
+      .first<Receipt>();
+    return receipt;
   }
 
   public async getReceipts(
@@ -312,19 +336,27 @@ export class Database extends DataSource {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     limit = 100
   ): Promise<Receipt[]> {
-    return [
-      {
-        receipt_id: '',
-        block_hash: '',
-        chunk_hash: '',
-        chunk_index: 0,
-        timestamp: '',
-        predecessor_id: '',
-        receiver_id: '',
-        receipt_kind: '',
-        transaction_hash: ''
+    let rowid = 0;
+    if (since_receipt_id != null) {
+      try {
+        rowid = (
+          await this.env.DB.prepare(
+            'SELECT rowid FROM receipts WHERE receipt_id = ?1'
+          )
+            .bind(since_receipt_id)
+            .first<{ rowid: number }>()
+        ).rowid;
+      } catch (err) {
+        console.error(err);
+        // ignore
       }
-    ];
+    }
+    const res = await this.env.DB.prepare(
+      'SELECT * FROM receipts WHERE rowid > ?1 LIMIT ?2'
+    )
+      .bind(rowid, limit)
+      .all<Receipt>();
+    return res.results ?? [];
   }
 
   public async getDataReceipt(data_id: string): Promise<DataReceipt> {
