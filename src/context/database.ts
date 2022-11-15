@@ -18,19 +18,37 @@ import {
   Receipt,
   Transaction,
   TransactionAction,
+  bindActionReceipt,
+  bindActionReceiptAction,
+  bindActionReceiptInputData,
+  bindActionReceiptOutputData,
   bindBlock,
   bindChunk,
   bindDataReceipt,
   bindReceipt,
   bindTransaction,
   bindTransactionAction,
+  getActionReceipt,
+  getActionReceiptAction,
+  getActionReceiptActionPrepare,
+  getActionReceiptActions,
+  getActionReceiptInputData,
+  getActionReceiptInputDataPrepare,
+  getActionReceiptInputDatas,
+  getActionReceiptOutputData,
+  getActionReceiptOutputDataPrepare,
+  getActionReceiptOutputDatas,
+  getActionReceiptPrepare,
+  getActionReceipts,
   getBlock,
   getBlockPrepare,
   getBlocks,
   getChunk,
   getChunkPrepare,
   getChunks,
+  getDataReceipt,
   getDataReceiptPrepare,
+  getDataReceipts,
   getReceipt,
   getReceiptPrepare,
   getReceipts,
@@ -55,6 +73,14 @@ export class Database extends DataSource {
     const transactionActionPrepare = getTransactionActionPrepare(this.env);
     const receiptPrepare = getReceiptPrepare(this.env);
     const dataReceiptPrepare = getDataReceiptPrepare(this.env);
+    const actionReceiptPrepare = getActionReceiptPrepare(this.env);
+    const actionReceiptActionPrepare = getActionReceiptActionPrepare(this.env);
+    const actionReceiptInputDataPrepare = getActionReceiptInputDataPrepare(
+      this.env
+    );
+    const actionReceiptOutputDataPrepare = getActionReceiptOutputDataPrepare(
+      this.env
+    );
     const queries = [];
 
     for (const data of blockData) {
@@ -64,7 +90,11 @@ export class Database extends DataSource {
         transactions,
         transaction_actions,
         receipts,
-        data_receipts
+        data_receipts,
+        action_receipts,
+        action_receipt_actions,
+        action_receipt_input_datas,
+        action_receipt_output_datas
       } = data;
 
       queries.push(bindBlock(blockPrepare, block));
@@ -84,6 +114,33 @@ export class Database extends DataSource {
       }
       for (const dataReceipt of data_receipts) {
         queries.push(bindDataReceipt(dataReceiptPrepare, dataReceipt));
+      }
+      for (const actionReceipt of action_receipts) {
+        queries.push(bindActionReceipt(actionReceiptPrepare, actionReceipt));
+      }
+      for (const actionReceiptAction of action_receipt_actions) {
+        queries.push(
+          bindActionReceiptAction(
+            actionReceiptActionPrepare,
+            actionReceiptAction
+          )
+        );
+      }
+      for (const actionReceiptInputData of action_receipt_input_datas) {
+        queries.push(
+          bindActionReceiptInputData(
+            actionReceiptInputDataPrepare,
+            actionReceiptInputData
+          )
+        );
+      }
+      for (const actionReceiptOutputData of action_receipt_output_datas) {
+        queries.push(
+          bindActionReceiptOutputData(
+            actionReceiptOutputDataPrepare,
+            actionReceiptOutputData
+          )
+        );
       }
     }
 
@@ -156,127 +213,64 @@ export class Database extends DataSource {
   }
 
   public async getDataReceipt(data_id: string): Promise<DataReceipt> {
-    return {
-      data_id,
-      receipt_id: '',
-      data_base64: ''
-    };
+    return getDataReceipt(this.env, data_id);
   }
 
   public async getDataReceipts(
     since_data_id?: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    limit = 100
+    limit?: number
   ): Promise<DataReceipt[]> {
-    return [
-      {
-        data_id: '',
-        receipt_id: '',
-        data_base64: ''
-      }
-    ];
+    return getDataReceipts(this.env, since_data_id, limit);
   }
 
   public async getActionReceipt(receipt_id: string): Promise<ActionReceipt> {
-    return {
-      receipt_id,
-      signer_account_id: '',
-      signer_public_key: '',
-      gas_price: ''
-    };
+    return getActionReceipt(this.env, receipt_id);
   }
 
   public async getActionReceipts(
     since_receipt_id?: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    limit = 100
+    limit?: number
   ): Promise<ActionReceipt[]> {
-    return [
-      {
-        receipt_id: '',
-        signer_account_id: '',
-        signer_public_key: '',
-        gas_price: ''
-      }
-    ];
+    return getActionReceipts(this.env, since_receipt_id, limit);
   }
 
   public async getActionReceiptAction(
     receipt_id: string
   ): Promise<ActionReceiptAction> {
-    return {
-      receipt_id,
-      index_in_action_receipt: 0,
-      action_kind: '',
-      args: '',
-      predecessor_id: '',
-      receiver_id: '',
-      timestamp: ''
-    };
+    return getActionReceiptAction(this.env, receipt_id);
   }
 
   public async getActionReceiptActions(
     since_receipt_id?: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    limit = 100
+    limit?: number
   ): Promise<ActionReceiptAction[]> {
-    return [
-      {
-        receipt_id: '',
-        index_in_action_receipt: 0,
-        action_kind: '',
-        args: '',
-        predecessor_id: '',
-        receiver_id: '',
-        timestamp: ''
-      }
-    ];
+    return getActionReceiptActions(this.env, since_receipt_id, limit);
   }
 
   public async getActionReceiptInputData(
     data_id: string
   ): Promise<ActionReceiptInputData> {
-    return {
-      data_id,
-      receipt_id: ''
-    };
+    return getActionReceiptInputData(this.env, data_id);
   }
 
   public async getActionReceiptInputDatas(
     since_data_id?: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    limit = 100
+    limit?: number
   ): Promise<ActionReceiptInputData[]> {
-    return [
-      {
-        data_id: '',
-        receipt_id: ''
-      }
-    ];
+    return getActionReceiptInputDatas(this.env, since_data_id, limit);
   }
 
   public async getActionReceiptOutputData(
     data_id: string
   ): Promise<ActionReceiptOutputData> {
-    return {
-      data_id,
-      receipt_id: '',
-      receiver_id: ''
-    };
+    return getActionReceiptOutputData(this.env, data_id);
   }
 
   public async getActionReceiptOutputDatas(
     since_data_id?: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    limit = 100
+    limit?: number
   ): Promise<ActionReceiptOutputData[]> {
-    return [
-      {
-        data_id: '',
-        receipt_id: '',
-        receiver_id: ''
-      }
-    ];
+    return getActionReceiptOutputDatas(this.env, since_data_id, limit);
   }
 
   public async getExecutionOutcome(

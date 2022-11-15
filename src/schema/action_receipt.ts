@@ -29,3 +29,66 @@ export const NewActionReceiptType = gql`
     gas_price: String!
   }
 `;
+
+export function getActionReceiptPrepare(env: Env): D1PreparedStatement {
+  return env.DB.prepare(
+    `INSERT INTO action_receipts (
+      receipt_id,
+      signer_account_id,
+      signer_public_key,
+      gas_price
+    ) VALUES (?1, ?2, ?3, ?4)`
+  );
+}
+
+export function bindActionReceipt(
+  prepare: D1PreparedStatement,
+  actionReceipt: ActionReceipt
+): D1PreparedStatement {
+  return prepare.bind(
+    actionReceipt.receipt_id,
+    actionReceipt.signer_account_id,
+    actionReceipt.signer_public_key,
+    actionReceipt.gas_price
+  );
+}
+
+export async function getActionReceipt(
+  env: Env,
+  receipt_id: string
+): Promise<ActionReceipt> {
+  const receipt = await env.DB.prepare(
+    'SELECT * FROM action_receipts WHERE receipt_id = ?1'
+  )
+    .bind(receipt_id)
+    .first<ActionReceipt>();
+  return receipt;
+}
+
+export async function getActionReceipts(
+  env: Env,
+  since_receipt_id?: string,
+  limit = 100
+): Promise<ActionReceipt[]> {
+  let rowid = 0;
+  if (since_receipt_id != null) {
+    try {
+      rowid = (
+        await env.DB.prepare(
+          'SELECT rowid FROM action_receipts WHERE receipt_id = ?1'
+        )
+          .bind(since_receipt_id)
+          .first<{ rowid: number }>()
+      ).rowid;
+    } catch (err) {
+      console.error(err);
+      // ignore
+    }
+  }
+  const res = await env.DB.prepare(
+    'SELECT * FROM action_receipts WHERE rowid > ?1 LIMIT ?2'
+  )
+    .bind(rowid, limit)
+    .all<ActionReceipt>();
+  return res.results ?? [];
+}

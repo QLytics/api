@@ -17,25 +17,21 @@ import {
 import {
   ActionReceipt,
   ActionReceiptType,
-  GetActionReceipts,
   NewActionReceiptType
 } from './action_receipt';
 import {
   ActionReceiptAction,
   ActionReceiptActionType,
-  GetActionReceiptActions,
   NewActionReceiptActionType
 } from './action_receipt_action';
 import {
   ActionReceiptInputData,
   ActionReceiptInputDataType,
-  GetActionReceiptInputDatas,
   NewActionReceiptInputDataType
 } from './action_receipt_input_data';
 import {
   ActionReceiptOutputData,
   ActionReceiptOutputDataType,
-  GetActionReceiptOutputDatas,
   NewActionReceiptOutputDataType
 } from './action_receipt_output_data';
 import { Block, BlockType, NewBlockType } from './block';
@@ -71,25 +67,21 @@ import {
 
 export * from './block';
 export * from './chunk';
-export * from './data_receipt';
-export * from './receipt';
 export * from './transaction';
 export * from './transaction_action';
+export * from './receipt';
+export * from './data_receipt';
+export * from './action_receipt';
+export * from './action_receipt_action';
+export * from './action_receipt_input_data';
+export * from './action_receipt_output_data';
 export {
   AccessKey,
   Account,
   AccountChange,
-  ActionReceipt,
-  ActionReceiptAction,
-  ActionReceiptInputData,
-  ActionReceiptOutputData,
   GetAccessKeys,
   GetAccounts,
   GetAccountChanges,
-  GetActionReceipts,
-  GetActionReceiptActions,
-  GetActionReceiptInputDatas,
-  GetActionReceiptOutputDatas,
   ExecutionOutcome,
   GetExecutionOutcomes,
   ExecutionOutcomeReceipt,
