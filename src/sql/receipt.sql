@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS receipts;
 CREATE TABLE receipts (
   receipt_id TEXT NOT NULL,
   block_hash TEXT NOT NULL,

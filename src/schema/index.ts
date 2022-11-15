@@ -43,7 +43,6 @@ import { Chunk, ChunkType, NewChunkType } from './chunk';
 import {
   DataReceipt,
   DataReceiptType,
-  GetDataReceipts,
   NewDataReceiptType
 } from './data_receipt';
 import {
@@ -72,6 +71,7 @@ import {
 
 export * from './block';
 export * from './chunk';
+export * from './data_receipt';
 export * from './receipt';
 export * from './transaction';
 export * from './transaction_action';
@@ -83,7 +83,6 @@ export {
   ActionReceiptAction,
   ActionReceiptInputData,
   ActionReceiptOutputData,
-  GetDataReceipts,
   GetAccessKeys,
   GetAccounts,
   GetAccountChanges,
@@ -91,7 +90,6 @@ export {
   GetActionReceiptActions,
   GetActionReceiptInputDatas,
   GetActionReceiptOutputDatas,
-  DataReceipt,
   ExecutionOutcome,
   GetExecutionOutcomes,
   ExecutionOutcomeReceipt,

@@ -20,6 +20,7 @@ import {
   TransactionAction,
   bindBlock,
   bindChunk,
+  bindDataReceipt,
   bindReceipt,
   bindTransaction,
   bindTransactionAction,
@@ -29,6 +30,7 @@ import {
   getChunk,
   getChunkPrepare,
   getChunks,
+  getDataReceiptPrepare,
   getReceipt,
   getReceiptPrepare,
   getReceipts,
@@ -52,11 +54,18 @@ export class Database extends DataSource {
     const transactionPrepare = getTransactionPrepare(this.env);
     const transactionActionPrepare = getTransactionActionPrepare(this.env);
     const receiptPrepare = getReceiptPrepare(this.env);
+    const dataReceiptPrepare = getDataReceiptPrepare(this.env);
     const queries = [];
 
     for (const data of blockData) {
-      const { block, chunks, transactions, transaction_actions, receipts } =
-        data;
+      const {
+        block,
+        chunks,
+        transactions,
+        transaction_actions,
+        receipts,
+        data_receipts
+      } = data;
 
       queries.push(bindBlock(blockPrepare, block));
       for (const chunk of chunks) {
@@ -72,6 +81,9 @@ export class Database extends DataSource {
       }
       for (const receipt of receipts) {
         queries.push(bindReceipt(receiptPrepare, receipt));
+      }
+      for (const dataReceipt of data_receipts) {
+        queries.push(bindDataReceipt(dataReceiptPrepare, dataReceipt));
       }
     }
 
