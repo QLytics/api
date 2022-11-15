@@ -17,7 +17,27 @@ import {
   GenesisBlockData,
   Receipt,
   Transaction,
-  TransactionAction
+  TransactionAction,
+  bindBlock,
+  bindChunk,
+  bindReceipt,
+  bindTransaction,
+  bindTransactionAction,
+  getBlock,
+  getBlockPrepare,
+  getBlocks,
+  getChunk,
+  getChunkPrepare,
+  getChunks,
+  getReceipt,
+  getReceiptPrepare,
+  getReceipts,
+  getTransaction,
+  getTransactionAction,
+  getTransactionActionPrepare,
+  getTransactionActions,
+  getTransactionPrepare,
+  getTransactions
 } from '../schema';
 
 export class Database extends DataSource {
@@ -27,148 +47,35 @@ export class Database extends DataSource {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async addBlockData(blockData: BlockData[]): Promise<number> {
-    const blockPrepare = this.env.DB.prepare(
-      `INSERT INTO blocks (
-      hash,
-      height,
-      prev_hash,
-      timestamp,
-      total_supply,
-      gas_price,
-      author_account_id
-    ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`
-    );
-    const chunkPrepare = this.env.DB.prepare(
-      `INSERT INTO chunks (
-        hash,
-        block_hash,
-        shard_id,
-        signature,
-        gas_limit,
-        gas_used,
-        author_account_id
-      ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`
-    );
-    const transactionPrepare = this.env.DB.prepare(
-      `INSERT INTO transactions (
-        hash,
-        block_hash,
-        chunk_hash,
-        chunk_index,
-        timestamp,
-        signer_id,
-        public_key,
-        nonce,
-        receiver_id,
-        signature,
-        status,
-        receipt_id,
-        gas_burnt,
-        tokens_burnt
-      ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)`
-    );
-    const transactionActionPrepare = this.env.DB.prepare(
-      `INSERT INTO transaction_actions (
-        hash,
-        transaction_index,
-        action_kind,
-        args
-      ) VALUES (?1, ?2, ?3, ?4)`
-    );
-    const receiptPrepare = this.env.DB.prepare(
-      `INSERT INTO receipts (
-        receipt_id,
-        block_hash,
-        chunk_hash,
-        chunk_index,
-        timestamp,
-        predecessor_id,
-        receiver_id,
-        receipt_kind,
-        transaction_hash
-      ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)`
-    );
+    const blockPrepare = getBlockPrepare(this.env);
+    const chunkPrepare = getChunkPrepare(this.env);
+    const transactionPrepare = getTransactionPrepare(this.env);
+    const transactionActionPrepare = getTransactionActionPrepare(this.env);
+    const receiptPrepare = getReceiptPrepare(this.env);
     const queries = [];
 
     for (const data of blockData) {
       const { block, chunks, transactions, transaction_actions, receipts } =
         data;
 
-      queries.push(
-        blockPrepare.bind(
-          block.hash,
-          block.height,
-          block.prev_hash,
-          block.timestamp,
-          block.total_supply,
-          block.gas_price,
-          block.author_account_id
-        )
-      );
-
+      queries.push(bindBlock(blockPrepare, block));
       for (const chunk of chunks) {
-        queries.push(
-          chunkPrepare.bind(
-            chunk.hash,
-            chunk.block_hash,
-            chunk.shard_id,
-            chunk.signature,
-            chunk.gas_limit,
-            chunk.gas_used,
-            chunk.author_account_id
-          )
-        );
+        queries.push(bindChunk(chunkPrepare, chunk));
       }
-
       for (const transaction of transactions) {
-        queries.push(
-          transactionPrepare.bind(
-            transaction.hash,
-            transaction.block_hash,
-            transaction.chunk_hash,
-            transaction.chunk_index,
-            transaction.timestamp,
-            transaction.signer_id,
-            transaction.public_key,
-            transaction.nonce,
-            transaction.receiver_id,
-            transaction.signature,
-            transaction.status,
-            transaction.receipt_id,
-            transaction.gas_burnt,
-            transaction.tokens_burnt
-          )
-        );
+        queries.push(bindTransaction(transactionPrepare, transaction));
       }
-
       for (const transactionAction of transaction_actions) {
         queries.push(
-          transactionActionPrepare.bind(
-            transactionAction.hash,
-            transactionAction.transaction_index,
-            transactionAction.action_kind,
-            transactionAction.args
-          )
+          bindTransactionAction(transactionActionPrepare, transactionAction)
         );
       }
-
       for (const receipt of receipts) {
-        queries.push(
-          receiptPrepare.bind(
-            receipt.receipt_id,
-            receipt.block_hash,
-            receipt.chunk_hash,
-            receipt.chunk_index,
-            receipt.timestamp,
-            receipt.predecessor_id,
-            receipt.receiver_id,
-            receipt.receipt_kind,
-            receipt.transaction_hash
-          )
-        );
+        queries.push(bindReceipt(receiptPrepare, receipt));
       }
     }
-    const res = await this.env.DB.batch<Block>(queries);
+
+    const res = await this.env.DB.batch(queries);
     return res.length;
   }
 
@@ -184,179 +91,56 @@ export class Database extends DataSource {
     return 0;
   }
 
-  public async getBlock(hash: string): Promise<Block> {
-    const block = await this.env.DB.prepare(
-      'SELECT * FROM blocks WHERE hash = ?1'
-    )
-      .bind(hash)
-      .first<Block>();
-    return block;
+  public getBlock(hash: string): Promise<Block> {
+    return getBlock(this.env, hash);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async getBlocks(since_hash?: string, limit = 100): Promise<Block[]> {
-    let rowid = 0;
-    if (since_hash != null) {
-      try {
-        rowid = (
-          await this.env.DB.prepare('SELECT rowid FROM blocks WHERE hash = ?1')
-            .bind(since_hash)
-            .first<{ rowid: number }>()
-        ).rowid;
-      } catch (err) {
-        console.error(err);
-        // ignore
-      }
-    }
-    const res = await this.env.DB.prepare(
-      'SELECT * FROM blocks WHERE rowid > ?1 LIMIT ?2'
-    )
-      .bind(rowid, limit)
-      .all<Block>();
-    return res.results ?? [];
+  public getBlocks(since_hash?: string, limit?: number): Promise<Block[]> {
+    return getBlocks(this.env, since_hash, limit);
   }
 
   public async getChunk(hash: string): Promise<Chunk> {
-    const chunk = await this.env.DB.prepare(
-      'SELECT * FROM chunks WHERE hash = ?1'
-    )
-      .bind(hash)
-      .first<Chunk>();
-    return chunk;
+    return getChunk(this.env, hash);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async getChunks(since_hash?: string, limit = 100): Promise<Chunk[]> {
-    let rowid = 0;
-    if (since_hash != null) {
-      try {
-        rowid = (
-          await this.env.DB.prepare('SELECT rowid FROM chunks WHERE hash = ?1')
-            .bind(since_hash)
-            .first<{ rowid: number }>()
-        ).rowid;
-      } catch (err) {
-        console.error(err);
-        // ignore
-      }
-    }
-    const res = await this.env.DB.prepare(
-      'SELECT * FROM chunks WHERE rowid > ?1 LIMIT ?2'
-    )
-      .bind(rowid, limit)
-      .all<Chunk>();
-    return res.results ?? [];
+  public async getChunks(
+    since_hash?: string,
+    limit?: number
+  ): Promise<Chunk[]> {
+    return getChunks(this.env, since_hash, limit);
   }
 
   public async getTransaction(hash: string): Promise<Transaction> {
-    const transaction = await this.env.DB.prepare(
-      'SELECT * FROM transactions WHERE hash = ?1'
-    )
-      .bind(hash)
-      .first<Transaction>();
-    return transaction;
+    return getTransaction(this.env, hash);
   }
 
   public async getTransactions(
     since_hash?: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    limit = 100
+    limit?: number
   ): Promise<Transaction[]> {
-    let rowid = 0;
-    if (since_hash != null) {
-      try {
-        rowid = (
-          await this.env.DB.prepare(
-            'SELECT rowid FROM transactions WHERE hash = ?1'
-          )
-            .bind(since_hash)
-            .first<{ rowid: number }>()
-        ).rowid;
-      } catch (err) {
-        console.error(err);
-        // ignore
-      }
-    }
-    const res = await this.env.DB.prepare(
-      'SELECT * FROM transactions WHERE rowid > ?1 LIMIT ?2'
-    )
-      .bind(rowid, limit)
-      .all<Transaction>();
-    return res.results ?? [];
+    return getTransactions(this.env, since_hash, limit);
   }
 
   public async getTransactionAction(hash: string): Promise<TransactionAction> {
-    const transactionAction = await this.env.DB.prepare(
-      'SELECT * FROM transaction_actions WHERE hash = ?1'
-    )
-      .bind(hash)
-      .first<TransactionAction>();
-    return transactionAction;
+    return getTransactionAction(this.env, hash);
   }
 
   public async getTransactionActions(
     since_hash?: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    limit = 100
+    limit?: number
   ): Promise<TransactionAction[]> {
-    let rowid = 0;
-    if (since_hash != null) {
-      try {
-        rowid = (
-          await this.env.DB.prepare(
-            'SELECT rowid FROM transaction_actions WHERE hash = ?1'
-          )
-            .bind(since_hash)
-            .first<{ rowid: number }>()
-        ).rowid;
-      } catch (err) {
-        console.error(err);
-        // ignore
-      }
-    }
-    const res = await this.env.DB.prepare(
-      'SELECT * FROM transaction_actions WHERE rowid > ?1 LIMIT ?2'
-    )
-      .bind(rowid, limit)
-      .all<TransactionAction>();
-    return res.results ?? [];
+    return getTransactionActions(this.env, since_hash, limit);
   }
 
   public async getReceipt(receipt_id: string): Promise<Receipt> {
-    const receipt = await this.env.DB.prepare(
-      'SELECT * FROM receipts WHERE receipt_id = ?1'
-    )
-      .bind(receipt_id)
-      .first<Receipt>();
-    return receipt;
+    return getReceipt(this.env, receipt_id);
   }
 
   public async getReceipts(
     since_receipt_id?: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    limit = 100
+    limit?: number
   ): Promise<Receipt[]> {
-    let rowid = 0;
-    if (since_receipt_id != null) {
-      try {
-        rowid = (
-          await this.env.DB.prepare(
-            'SELECT rowid FROM receipts WHERE receipt_id = ?1'
-          )
-            .bind(since_receipt_id)
-            .first<{ rowid: number }>()
-        ).rowid;
-      } catch (err) {
-        console.error(err);
-        // ignore
-      }
-    }
-    const res = await this.env.DB.prepare(
-      'SELECT * FROM receipts WHERE rowid > ?1 LIMIT ?2'
-    )
-      .bind(rowid, limit)
-      .all<Receipt>();
-    return res.results ?? [];
+    return getReceipts(this.env, since_receipt_id, limit);
   }
 
   public async getDataReceipt(data_id: string): Promise<DataReceipt> {

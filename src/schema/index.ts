@@ -38,8 +38,8 @@ import {
   GetActionReceiptOutputDatas,
   NewActionReceiptOutputDataType
 } from './action_receipt_output_data';
-import { Block, BlockType, GetBlocks, NewBlockType } from './block';
-import { Chunk, ChunkType, GetChunks, NewChunkType } from './chunk';
+import { Block, BlockType, NewBlockType } from './block';
+import { Chunk, ChunkType, NewChunkType } from './chunk';
 import {
   DataReceipt,
   DataReceiptType,
@@ -58,20 +58,23 @@ import {
   GetExecutionOutcomeReceipts,
   NewExecutionOutcomeReceiptType
 } from './execution_outcome_receipt';
-import { GetReceipts, NewReceiptType, Receipt, ReceiptType } from './receipt';
+import { NewReceiptType, Receipt, ReceiptType } from './receipt';
 import {
-  GetTransactions,
   NewTransactionType,
   Transaction,
   TransactionType
 } from './transaction';
 import {
-  GetTransactionActions,
   NewTransactionActionType,
   TransactionAction,
   TransactionActionType
 } from './transaction_action';
 
+export * from './block';
+export * from './chunk';
+export * from './receipt';
+export * from './transaction';
+export * from './transaction_action';
 export {
   AccessKey,
   Account,
@@ -80,15 +83,6 @@ export {
   ActionReceiptAction,
   ActionReceiptInputData,
   ActionReceiptOutputData,
-  Block,
-  Chunk,
-  GetChunks,
-  GetBlocks,
-  Transaction,
-  TransactionAction,
-  GetTransactions,
-  GetTransactionActions,
-  GetReceipts,
   GetDataReceipts,
   GetAccessKeys,
   GetAccounts,
@@ -97,7 +91,6 @@ export {
   GetActionReceiptActions,
   GetActionReceiptInputDatas,
   GetActionReceiptOutputDatas,
-  Receipt,
   DataReceipt,
   ExecutionOutcome,
   GetExecutionOutcomes,
