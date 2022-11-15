@@ -144,8 +144,13 @@ export class Database extends DataSource {
       }
     }
 
-    const res = await this.env.DB.batch(queries);
-    return res.length;
+    try {
+      this.env.DB.batch(queries);
+      return queries.length;
+    } catch (err) {
+      console.error(err);
+      return 0;
+    }
   }
 
   public async addGenesisBlockData(
