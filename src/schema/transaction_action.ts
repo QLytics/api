@@ -1,8 +1,8 @@
 import { gql } from 'apollo-server-cloudflare';
 
 export interface TransactionAction {
-  hash: string;
-  transaction_index: number;
+  transaction_hash: string;
+  index_in_transaction: number;
   action_kind: string;
   args: string;
 }
@@ -14,8 +14,8 @@ export interface GetTransactionActions {
 
 export const TransactionActionType = gql`
   type TransactionAction {
-    hash: String!
-    transaction_index: Int!
+    transaction_hash: String!
+    index_in_transaction: Int!
     action_kind: String!
     args: String!
   }
@@ -23,42 +23,19 @@ export const TransactionActionType = gql`
 
 export const NewTransactionActionType = gql`
   input NewTransactionAction {
-    hash: String!
-    transaction_index: Int!
+    transaction_hash: String!
+    index_in_transaction: Int!
     action_kind: String!
     args: String!
   }
 `;
-
-export function getTransactionActionPrepare(env: Env): D1PreparedStatement {
-  return env.DB.prepare(
-    `INSERT INTO transaction_actions (
-      hash,
-      transaction_index,
-      action_kind,
-      args
-    ) VALUES (?1, ?2, ?3, ?4)`
-  );
-}
-
-export function bindTransactionAction(
-  prepare: D1PreparedStatement,
-  transactionAction: TransactionAction
-): D1PreparedStatement {
-  return prepare.bind(
-    transactionAction.hash,
-    transactionAction.transaction_index,
-    transactionAction.action_kind,
-    transactionAction.args
-  );
-}
 
 export async function getTransactionAction(
   env: Env,
   hash: string
 ): Promise<TransactionAction> {
   const transactionAction = await env.DB.prepare(
-    'SELECT * FROM transaction_actions WHERE hash = ?1'
+    'SELECT * FROM transaction_actions WHERE transaction_hash = ?1'
   )
     .bind(hash)
     .first<TransactionAction>();
@@ -75,7 +52,7 @@ export async function getTransactionActions(
     try {
       rowid = (
         await env.DB.prepare(
-          'SELECT rowid FROM transaction_actions WHERE hash = ?1'
+          'SELECT rowid FROM transaction_actions WHERE transaction_hash = ?1'
         )
           .bind(since_hash)
           .first<{ rowid: number }>()

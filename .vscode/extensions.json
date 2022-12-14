@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "adpyke.vscode-sql-formatter",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode"
+  ]
+}

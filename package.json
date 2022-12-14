@@ -13,7 +13,9 @@
   "dependencies": {
     "apollo-datasource": "^3",
     "apollo-server-cloudflare": "^3",
-    "graphql": "^16"
+    "graphql": "^16",
+    "kysely": "^0.22",
+    "kysely-d1": "^0.0.6"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3",

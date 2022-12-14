@@ -1,4 +1,5 @@
 import type { IExecutableSchemaDefinition } from '@graphql-tools/schema';
+// import { BigIntResolver } from 'graphql-scalars';
 
 import { Context } from './context';
 import {
@@ -37,8 +38,14 @@ import {
 } from './schema';
 
 export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
+  // BigInt: BigIntResolver,
+
   Query: {
-    block: async (_: unknown, { hash }: Block, { dataSources }: Context) => {
+    block: async (
+      _: unknown,
+      { block_hash: hash }: Block,
+      { dataSources }: Context
+    ) => {
       return dataSources.database.getBlock(hash);
     },
     blocks: async (
@@ -48,7 +55,11 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
     ) => {
       return dataSources.database.getBlocks(since_hash, limit);
     },
-    chunk: async (_: unknown, { hash }: Chunk, { dataSources }: Context) => {
+    chunk: async (
+      _: unknown,
+      { chunk_hash: hash }: Chunk,
+      { dataSources }: Context
+    ) => {
       return dataSources.database.getChunk(hash);
     },
     chunks: async (
@@ -60,7 +71,7 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
     },
     transaction: async (
       _: unknown,
-      { hash }: Transaction,
+      { transaction_hash: hash }: Transaction,
       { dataSources }: Context
     ) => {
       return dataSources.database.getTransaction(hash);
@@ -74,7 +85,7 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
     },
     transactionAction: async (
       _: unknown,
-      { hash }: TransactionAction,
+      { transaction_hash: hash }: TransactionAction,
       { dataSources }: Context
     ) => {
       return dataSources.database.getTransactionAction(hash);
@@ -253,6 +264,7 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
       return dataSources.database.getAccessKeys(since_public_key, limit);
     }
   },
+
   Mutation: {
     addBlockData: async (
       _: unknown,

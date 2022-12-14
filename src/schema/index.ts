@@ -37,8 +37,8 @@ import {
 import { Block, BlockType, NewBlockType } from './block';
 import { Chunk, ChunkType, NewChunkType } from './chunk';
 import {
-  DataReceipt,
   DataReceiptType,
+  NewDataReceipt,
   NewDataReceiptType
 } from './data_receipt';
 import {
@@ -94,7 +94,7 @@ export interface BlockData {
   transactions: Transaction[];
   transaction_actions: TransactionAction[];
   receipts: Receipt[];
-  data_receipts: DataReceipt[];
+  data_receipts: NewDataReceipt[];
   action_receipts: ActionReceipt[];
   action_receipt_actions: ActionReceiptAction[];
   action_receipt_input_datas: ActionReceiptInputData[];

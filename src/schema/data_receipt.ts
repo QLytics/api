@@ -3,7 +3,13 @@ import { gql } from 'apollo-server-cloudflare';
 export interface DataReceipt {
   data_id: string;
   receipt_id: string;
-  data_base64: string;
+  data?: number[];
+}
+
+export interface NewDataReceipt {
+  data_id: string;
+  receipt_id: string;
+  data_base64?: string;
 }
 
 export interface GetDataReceipts {
@@ -26,27 +32,6 @@ export const NewDataReceiptType = gql`
     data_base64: String
   }
 `;
-
-export function getDataReceiptPrepare(env: Env): D1PreparedStatement {
-  return env.DB.prepare(
-    `INSERT INTO data_receipts (
-      data_id TEXT NOT NULL,
-      receipt_id TEXT NOT NULL,
-      data_base64 TEXT NOT NULL
-    ) VALUES (?1, ?2, ?3)`
-  );
-}
-
-export function bindDataReceipt(
-  prepare: D1PreparedStatement,
-  dataReceipt: DataReceipt
-): D1PreparedStatement {
-  return prepare.bind(
-    dataReceipt.data_id,
-    dataReceipt.receipt_id,
-    dataReceipt.data_base64
-  );
-}
 
 export async function getDataReceipt(
   env: Env,

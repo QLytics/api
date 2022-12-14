@@ -1,20 +1,20 @@
 import { gql } from 'apollo-server-cloudflare';
 
 export interface Transaction {
-  hash: string;
-  block_hash: string;
-  chunk_hash: string;
-  chunk_index: number;
-  timestamp: string;
-  signer_id: string;
-  public_key: string;
+  transaction_hash: string;
+  included_in_block_hash: string;
+  included_in_chunk_hash: string;
+  index_in_chunk: number;
+  block_timestamp: string;
+  signer_account_id: string;
+  signer_public_key: string;
   nonce: string;
-  receiver_id: string;
+  receiver_account_id: string;
   signature: string;
   status: string;
-  receipt_id: string;
-  gas_burnt: string;
-  tokens_burnt: string;
+  converted_into_receipt_id: string;
+  receipt_conversion_gas_burnt: string;
+  receipt_conversion_tokens_burnt: string;
 }
 
 export interface GetTransactions {
@@ -24,91 +24,48 @@ export interface GetTransactions {
 
 export const TransactionType = gql`
   type Transaction {
-    hash: String!
-    block_hash: String!
-    chunk_hash: String!
-    chunk_index: Int!
-    timestamp: String!
-    signer_id: String!
-    public_key: String!
+    transaction_hash: String!
+    included_in_block_hash: String!
+    included_in_chunk_hash: String!
+    index_in_chunk: Int!
+    block_timestamp: String!
+    signer_account_id: String!
+    signer_public_key: String!
     nonce: String!
-    receiver_id: String!
+    receiver_account_id: String!
     signature: String!
     status: String!
-    receipt_id: String!
-    gas_burnt: String!
-    tokens_burnt: String!
+    converted_into_receipt_id: String!
+    receipt_conversion_gas_burnt: String!
+    receipt_conversion_tokens_burnt: String!
   }
 `;
 
 export const NewTransactionType = gql`
   input NewTransaction {
-    hash: String!
-    block_hash: String!
-    chunk_hash: String!
-    chunk_index: Int!
-    timestamp: String!
-    signer_id: String!
-    public_key: String!
+    transaction_hash: String!
+    included_in_block_hash: String!
+    included_in_chunk_hash: String!
+    index_in_chunk: Int!
+    block_timestamp: String!
+    signer_account_id: String!
+    signer_public_key: String!
     nonce: String!
-    receiver_id: String!
+    receiver_account_id: String!
     signature: String!
     status: String!
-    receipt_id: String!
-    gas_burnt: String!
-    tokens_burnt: String!
+    converted_into_receipt_id: String!
+    receipt_conversion_gas_burnt: String!
+    receipt_conversion_tokens_burnt: String!
   }
 `;
-
-export function getTransactionPrepare(env: Env): D1PreparedStatement {
-  return env.DB.prepare(
-    `INSERT INTO transactions (
-      hash,
-      block_hash,
-      chunk_hash,
-      chunk_index,
-      timestamp,
-      signer_id,
-      public_key,
-      nonce,
-      receiver_id,
-      signature,
-      status,
-      receipt_id,
-      gas_burnt,
-      tokens_burnt
-    ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)`
-  );
-}
-
-export function bindTransaction(
-  prepare: D1PreparedStatement,
-  transaction: Transaction
-): D1PreparedStatement {
-  return prepare.bind(
-    transaction.hash,
-    transaction.block_hash,
-    transaction.chunk_hash,
-    transaction.chunk_index,
-    transaction.timestamp,
-    transaction.signer_id,
-    transaction.public_key,
-    transaction.nonce,
-    transaction.receiver_id,
-    transaction.signature,
-    transaction.status,
-    transaction.receipt_id,
-    transaction.gas_burnt,
-    transaction.tokens_burnt
-  );
-}
 
 export async function getTransaction(
   env: Env,
   hash: string
 ): Promise<Transaction> {
   const transaction = await env.DB.prepare(
-    'SELECT * FROM transactions WHERE hash = ?1'
+    'SELECT * FROM transactions WHERE transaction_hash = ?1'
   )
     .bind(hash)
     .first<Transaction>();
@@ -124,7 +81,9 @@ export async function getTransactions(
   if (since_hash != null) {
     try {
       rowid = (
-        await env.DB.prepare('SELECT rowid FROM transactions WHERE hash = ?1')
+        await env.DB.prepare(
+          'SELECT rowid FROM transactions WHERE transaction_hash = ?1'
+        )
           .bind(since_hash)
           .first<{ rowid: number }>()
       ).rowid;

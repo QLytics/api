@@ -30,29 +30,6 @@ export const NewActionReceiptType = gql`
   }
 `;
 
-export function getActionReceiptPrepare(env: Env): D1PreparedStatement {
-  return env.DB.prepare(
-    `INSERT INTO action_receipts (
-      receipt_id,
-      signer_account_id,
-      signer_public_key,
-      gas_price
-    ) VALUES (?1, ?2, ?3, ?4)`
-  );
-}
-
-export function bindActionReceipt(
-  prepare: D1PreparedStatement,
-  actionReceipt: ActionReceipt
-): D1PreparedStatement {
-  return prepare.bind(
-    actionReceipt.receipt_id,
-    actionReceipt.signer_account_id,
-    actionReceipt.signer_public_key,
-    actionReceipt.gas_price
-  );
-}
-
 export async function getActionReceipt(
   env: Env,
   receipt_id: string

@@ -1,4 +1,6 @@
 import { DataSource } from 'apollo-datasource';
+import { Kysely } from 'kysely';
+import { D1Dialect } from 'kysely-d1';
 
 import {
   AccessKey,
@@ -18,16 +20,6 @@ import {
   Receipt,
   Transaction,
   TransactionAction,
-  bindActionReceipt,
-  bindActionReceiptAction,
-  bindActionReceiptInputData,
-  bindActionReceiptOutputData,
-  bindBlock,
-  bindChunk,
-  bindDataReceipt,
-  bindReceipt,
-  bindTransaction,
-  bindTransactionAction,
   getActionReceipt,
   getActionReceiptAction,
   getActionReceiptActionPrepare,
@@ -38,42 +30,33 @@ import {
   getActionReceiptOutputData,
   getActionReceiptOutputDataPrepare,
   getActionReceiptOutputDatas,
-  getActionReceiptPrepare,
   getActionReceipts,
   getBlock,
-  getBlockPrepare,
   getBlocks,
   getChunk,
-  getChunkPrepare,
   getChunks,
   getDataReceipt,
-  getDataReceiptPrepare,
   getDataReceipts,
   getReceipt,
-  getReceiptPrepare,
   getReceipts,
   getTransaction,
   getTransactionAction,
-  getTransactionActionPrepare,
   getTransactionActions,
-  getTransactionPrepare,
   getTransactions
 } from '../schema';
+
+import { DbSchema } from './db-schema';
 
 export class Database extends DataSource {
   constructor(private env: Env) {
     super();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async addBlockData(blockData: BlockData[]): Promise<number> {
-    const blockPrepare = getBlockPrepare(this.env);
-    const chunkPrepare = getChunkPrepare(this.env);
-    const transactionPrepare = getTransactionPrepare(this.env);
-    const transactionActionPrepare = getTransactionActionPrepare(this.env);
-    const receiptPrepare = getReceiptPrepare(this.env);
-    const dataReceiptPrepare = getDataReceiptPrepare(this.env);
-    const actionReceiptPrepare = getActionReceiptPrepare(this.env);
+    const db = new Kysely<DbSchema>({
+      dialect: new D1Dialect({ database: this.env.DB })
+    });
+
     const actionReceiptActionPrepare = getActionReceiptActionPrepare(this.env);
     const actionReceiptInputDataPrepare = getActionReceiptInputDataPrepare(
       this.env
@@ -81,7 +64,7 @@ export class Database extends DataSource {
     const actionReceiptOutputDataPrepare = getActionReceiptOutputDataPrepare(
       this.env
     );
-    const queries = [];
+    const queries: D1PreparedStatement[] = [];
 
     for (const data of blockData) {
       const {
@@ -97,51 +80,84 @@ export class Database extends DataSource {
         action_receipt_output_datas
       } = data;
 
-      queries.push(bindBlock(blockPrepare, block));
-      for (const chunk of chunks) {
-        queries.push(bindChunk(chunkPrepare, chunk));
+      try {
+        db.insertInto('blocks')
+          .values(block)
+          .onConflict(oc => oc.doNothing())
+          .execute();
+        if (chunks.length > 0) {
+          db.insertInto('chunks')
+            .onConflict(oc => oc.doNothing())
+            .values(chunks)
+            .execute();
+        }
+        if (transactions.length > 0) {
+          db.insertInto('transactions')
+            .values(transactions)
+            .onConflict(oc => oc.doNothing())
+            .execute();
+        }
+        if (transaction_actions.length > 0) {
+          db.insertInto('transaction_actions')
+            .values(transaction_actions)
+            .onConflict(oc => oc.doNothing())
+            .execute();
+        }
+        if (receipts.length > 0) {
+          db.insertInto('receipts')
+            .values(receipts)
+            .onConflict(oc => oc.doNothing())
+            .execute();
+        }
+        if (data_receipts.length > 0) {
+          const dataReceipts = data_receipts.map(
+            ({ data_id, receipt_id, data_base64 }): DataReceipt => ({
+              data_id,
+              receipt_id,
+              data: data_base64
+                ? Array.from(base64ToUint8Array(data_base64))
+                : undefined
+            })
+          );
+          db.insertInto('data_receipts')
+            .values(dataReceipts)
+            .onConflict(oc => oc.doNothing())
+            .execute();
+        }
+        if (action_receipts.length > 0) {
+          db.insertInto('action_receipts')
+            .values(action_receipts)
+            .onConflict(oc => oc.doNothing())
+            .execute();
+        }
+      } catch (err) {
+        console.error(err);
+        return 0;
       }
-      for (const transaction of transactions) {
-        queries.push(bindTransaction(transactionPrepare, transaction));
-      }
-      for (const transactionAction of transaction_actions) {
-        queries.push(
-          bindTransactionAction(transactionActionPrepare, transactionAction)
-        );
-      }
-      for (const receipt of receipts) {
-        queries.push(bindReceipt(receiptPrepare, receipt));
-      }
-      for (const dataReceipt of data_receipts) {
-        queries.push(bindDataReceipt(dataReceiptPrepare, dataReceipt));
-      }
-      for (const actionReceipt of action_receipts) {
-        queries.push(bindActionReceipt(actionReceiptPrepare, actionReceipt));
-      }
-      for (const actionReceiptAction of action_receipt_actions) {
-        queries.push(
-          bindActionReceiptAction(
-            actionReceiptActionPrepare,
-            actionReceiptAction
-          )
-        );
-      }
-      for (const actionReceiptInputData of action_receipt_input_datas) {
-        queries.push(
-          bindActionReceiptInputData(
-            actionReceiptInputDataPrepare,
-            actionReceiptInputData
-          )
-        );
-      }
-      for (const actionReceiptOutputData of action_receipt_output_datas) {
-        queries.push(
-          bindActionReceiptOutputData(
-            actionReceiptOutputDataPrepare,
-            actionReceiptOutputData
-          )
-        );
-      }
+      // for (const actionReceiptAction of action_receipt_actions) {
+      //   queries.push(
+      //     bindActionReceiptAction(
+      //       actionReceiptActionPrepare,
+      //       actionReceiptAction
+      //     )
+      //   );
+      // }
+      // for (const actionReceiptInputData of action_receipt_input_datas) {
+      //   queries.push(
+      //     bindActionReceiptInputData(
+      //       actionReceiptInputDataPrepare,
+      //       actionReceiptInputData
+      //     )
+      //   );
+      // }
+      // for (const actionReceiptOutputData of action_receipt_output_datas) {
+      //   queries.push(
+      //     bindActionReceiptOutputData(
+      //       actionReceiptOutputDataPrepare,
+      //       actionReceiptOutputData
+      //     )
+      //   );
+      // }
     }
 
     try {
@@ -419,4 +435,14 @@ export class Database extends DataSource {
       }
     ];
   }
+}
+
+function base64ToUint8Array(base64: string): Uint8Array {
+  const binary_string = atob(base64);
+  const len = binary_string.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binary_string.charCodeAt(i);
+  }
+  return bytes;
 }

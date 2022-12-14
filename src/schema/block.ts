@@ -1,10 +1,10 @@
 import { gql } from 'apollo-server-cloudflare';
 
 export interface Block {
-  hash: string;
-  height: string;
-  prev_hash: string;
-  timestamp: string;
+  block_hash: string;
+  block_height: string;
+  prev_block_hash: string;
+  block_timestamp: string;
   total_supply: string;
   gas_price: string;
   author_account_id: string;
@@ -17,10 +17,10 @@ export interface GetBlocks {
 
 export const BlockType = gql`
   type Block {
-    hash: ID!
-    height: String!
-    prev_hash: String!
-    timestamp: String!
+    block_hash: ID!
+    block_height: String!
+    prev_block_hash: String!
+    block_timestamp: String!
     total_supply: String!
     gas_price: String!
     author_account_id: String!
@@ -29,44 +29,15 @@ export const BlockType = gql`
 
 export const NewBlockType = gql`
   input NewBlock {
-    hash: ID!
-    height: String!
-    prev_hash: String!
-    timestamp: String!
+    block_hash: ID!
+    block_height: String!
+    prev_block_hash: String!
+    block_timestamp: String!
     total_supply: String!
     gas_price: String!
     author_account_id: String!
   }
 `;
-
-export function getBlockPrepare(env: Env): D1PreparedStatement {
-  return env.DB.prepare(
-    `INSERT INTO blocks (
-    hash,
-    height,
-    prev_hash,
-    timestamp,
-    total_supply,
-    gas_price,
-    author_account_id
-  ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`
-  );
-}
-
-export function bindBlock(
-  prepare: D1PreparedStatement,
-  block: Block
-): D1PreparedStatement {
-  return prepare.bind(
-    block.hash,
-    block.height,
-    block.prev_hash,
-    block.timestamp,
-    block.total_supply,
-    block.gas_price,
-    block.author_account_id
-  );
-}
 
 export async function getBlock(env: Env, hash: string): Promise<Block> {
   const block = await env.DB.prepare('SELECT * FROM blocks WHERE hash = ?1')
