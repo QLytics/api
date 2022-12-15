@@ -1,4 +1,7 @@
 import { gql } from 'apollo-server-cloudflare';
+import { Kysely } from 'kysely';
+
+import { DbSchema } from '../context/db-schema';
 
 export interface DataReceipt {
   data_id: string;
@@ -34,41 +37,45 @@ export const NewDataReceiptType = gql`
 `;
 
 export async function getDataReceipt(
-  env: Env,
+  db: Kysely<DbSchema>,
   data_id: string
-): Promise<DataReceipt> {
-  const receipt = await env.DB.prepare(
-    'SELECT * FROM data_receipts WHERE data_id = ?1'
-  )
-    .bind(data_id)
-    .first<DataReceipt>();
-  return receipt;
+): Promise<DataReceipt | undefined> {
+  const dataReceipt = await db
+    .selectFrom('data_receipts')
+    .selectAll()
+    .where('data_id', '=', data_id)
+    .executeTakeFirst();
+  return dataReceipt;
 }
 
 export async function getDataReceipts(
-  env: Env,
+  db: Kysely<DbSchema>,
   since_data_id?: string,
   limit = 100
 ): Promise<DataReceipt[]> {
   let rowid = 0;
   if (since_data_id != null) {
     try {
-      rowid = (
-        await env.DB.prepare(
-          'SELECT rowid FROM data_receipts WHERE data_id = ?1'
-        )
-          .bind(since_data_id)
-          .first<{ rowid: number }>()
-      ).rowid;
+      rowid =
+        (
+          await db
+            .selectFrom('data_receipts')
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .select('rowid' as any)
+            .where('data_id', '=', since_data_id)
+            .executeTakeFirst()
+        )?.rowid ?? 0;
     } catch (err) {
       console.error(err);
       // ignore
     }
   }
-  const res = await env.DB.prepare(
-    'SELECT * FROM data_receipts WHERE rowid > ?1 LIMIT ?2'
-  )
-    .bind(rowid, limit)
-    .all<DataReceipt>();
-  return res.results ?? [];
+  const res = await db
+    .selectFrom('data_receipts')
+    .selectAll()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .where('rowid' as any, '>', rowid)
+    .limit(limit)
+    .execute();
+  return res;
 }

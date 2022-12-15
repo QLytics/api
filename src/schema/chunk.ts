@@ -1,4 +1,7 @@
 import { gql } from 'apollo-server-cloudflare';
+import { Kysely } from 'kysely';
+
+import { DbSchema } from '../context/db-schema';
 
 export interface Chunk {
   chunk_hash: string;
@@ -11,7 +14,7 @@ export interface Chunk {
 }
 
 export interface GetChunks {
-  since_hash?: string;
+  since_chunk_hash?: string;
   limit?: number;
 }
 
@@ -38,38 +41,46 @@ export const NewChunkType = gql`
     author_account_id: String!
   }
 `;
-
-export async function getChunk(env: Env, hash: string): Promise<Chunk> {
-  const chunk = await env.DB.prepare(
-    'SELECT * FROM chunks WHERE chunk_hash = ?1'
-  )
-    .bind(hash)
-    .first<Chunk>();
+export async function getChunk(
+  db: Kysely<DbSchema>,
+  hash: string
+): Promise<Chunk | undefined> {
+  const chunk = await db
+    .selectFrom('chunks')
+    .selectAll()
+    .where('chunk_hash', '=', hash)
+    .executeTakeFirst();
   return chunk;
 }
 
 export async function getChunks(
-  env: Env,
-  since_hash?: string,
+  db: Kysely<DbSchema>,
+  since_chunk_hash?: string,
   limit = 100
 ): Promise<Chunk[]> {
   let rowid = 0;
-  if (since_hash != null) {
+  if (since_chunk_hash != null) {
     try {
-      rowid = (
-        await env.DB.prepare('SELECT rowid FROM chunks WHERE chunk_hash = ?1')
-          .bind(since_hash)
-          .first<{ rowid: number }>()
-      ).rowid;
+      rowid =
+        (
+          await db
+            .selectFrom('chunks')
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .select('rowid' as any)
+            .where('chunk_hash', '=', since_chunk_hash)
+            .executeTakeFirst()
+        )?.rowid ?? 0;
     } catch (err) {
       console.error(err);
       // ignore
     }
   }
-  const res = await env.DB.prepare(
-    'SELECT * FROM chunks WHERE rowid > ?1 LIMIT ?2'
-  )
-    .bind(rowid, limit)
-    .all<Chunk>();
-  return res.results ?? [];
+  const res = await db
+    .selectFrom('chunks')
+    .selectAll()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .where('rowid' as any, '>', rowid)
+    .limit(limit)
+    .execute();
+  return res;
 }

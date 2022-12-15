@@ -62,6 +62,7 @@ import {
 import {
   NewTransactionActionType,
   TransactionAction,
+  TransactionActionPk,
   TransactionActionType
 } from './transaction_action';
 
@@ -123,6 +124,7 @@ export const typeDefs = gql`
 
   ${TransactionActionType}
   ${NewTransactionActionType}
+  ${TransactionActionPk}
 
   ${ReceiptType}
   ${NewReceiptType}
@@ -187,14 +189,17 @@ export const typeDefs = gql`
   }
 
   type Query {
-    block(hash: ID!): Block
-    blocks(since_hash: ID, limit: Int = 100): [Block]
-    chunk(hash: ID!): Chunk
-    chunks(since_hash: ID, limit: Int = 100): [Chunk]
-    transaction(hash: ID!): Transaction
-    transactions(since_hash: ID, limit: Int = 100): [Transaction]
-    transactionAction(hash: ID!): TransactionAction
-    transactionActions(since_hash: ID, limit: Int = 100): [TransactionAction]
+    block(block_hash: ID!): Block
+    blocks(since_block_hash: ID, limit: Int = 100): [Block]
+    chunk(chunk_hash: ID!): Chunk
+    chunks(since_chunk_hash: ID, limit: Int = 100): [Chunk]
+    transaction(transaction_hash: ID!): Transaction
+    transactions(since_transaction_hash: ID, limit: Int = 100): [Transaction]
+    transactionAction(pk: TransactionActionPk!): TransactionAction
+    transactionActions(
+      since_pk: TransactionActionPk
+      limit: Int = 100
+    ): [TransactionAction]
     receipt(receipt_id: ID!): Receipt
     receipts(since_receipt_id: ID, limit: Int = 100): [Receipt]
     dataReceipt(data_id: ID!): DataReceipt

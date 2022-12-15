@@ -22,13 +22,10 @@ import {
   TransactionAction,
   getActionReceipt,
   getActionReceiptAction,
-  getActionReceiptActionPrepare,
   getActionReceiptActions,
   getActionReceiptInputData,
-  getActionReceiptInputDataPrepare,
   getActionReceiptInputDatas,
   getActionReceiptOutputData,
-  getActionReceiptOutputDataPrepare,
   getActionReceiptOutputDatas,
   getActionReceipts,
   getBlock,
@@ -48,22 +45,16 @@ import {
 import { DbSchema } from './db-schema';
 
 export class Database extends DataSource {
+  private db: Kysely<DbSchema>;
+
   constructor(private env: Env) {
     super();
+    this.db = new Kysely<DbSchema>({
+      dialect: new D1Dialect({ database: this.env.DB })
+    });
   }
 
   public async addBlockData(blockData: BlockData[]): Promise<number> {
-    const db = new Kysely<DbSchema>({
-      dialect: new D1Dialect({ database: this.env.DB })
-    });
-
-    const actionReceiptActionPrepare = getActionReceiptActionPrepare(this.env);
-    const actionReceiptInputDataPrepare = getActionReceiptInputDataPrepare(
-      this.env
-    );
-    const actionReceiptOutputDataPrepare = getActionReceiptOutputDataPrepare(
-      this.env
-    );
     const queries: D1PreparedStatement[] = [];
 
     for (const data of blockData) {
@@ -74,37 +65,39 @@ export class Database extends DataSource {
         transaction_actions,
         receipts,
         data_receipts,
-        action_receipts,
-        action_receipt_actions,
-        action_receipt_input_datas,
-        action_receipt_output_datas
+        action_receipts
       } = data;
 
       try {
-        db.insertInto('blocks')
+        this.db
+          .insertInto('blocks')
           .values(block)
           .onConflict(oc => oc.doNothing())
           .execute();
         if (chunks.length > 0) {
-          db.insertInto('chunks')
+          this.db
+            .insertInto('chunks')
             .onConflict(oc => oc.doNothing())
             .values(chunks)
             .execute();
         }
         if (transactions.length > 0) {
-          db.insertInto('transactions')
+          this.db
+            .insertInto('transactions')
             .values(transactions)
             .onConflict(oc => oc.doNothing())
             .execute();
         }
         if (transaction_actions.length > 0) {
-          db.insertInto('transaction_actions')
+          this.db
+            .insertInto('transaction_actions')
             .values(transaction_actions)
             .onConflict(oc => oc.doNothing())
             .execute();
         }
         if (receipts.length > 0) {
-          db.insertInto('receipts')
+          this.db
+            .insertInto('receipts')
             .values(receipts)
             .onConflict(oc => oc.doNothing())
             .execute();
@@ -119,13 +112,15 @@ export class Database extends DataSource {
                 : undefined
             })
           );
-          db.insertInto('data_receipts')
+          this.db
+            .insertInto('data_receipts')
             .values(dataReceipts)
             .onConflict(oc => oc.doNothing())
             .execute();
         }
         if (action_receipts.length > 0) {
-          db.insertInto('action_receipts')
+          this.db
+            .insertInto('action_receipts')
             .values(action_receipts)
             .onConflict(oc => oc.doNothing())
             .execute();
@@ -134,30 +129,6 @@ export class Database extends DataSource {
         console.error(err);
         return 0;
       }
-      // for (const actionReceiptAction of action_receipt_actions) {
-      //   queries.push(
-      //     bindActionReceiptAction(
-      //       actionReceiptActionPrepare,
-      //       actionReceiptAction
-      //     )
-      //   );
-      // }
-      // for (const actionReceiptInputData of action_receipt_input_datas) {
-      //   queries.push(
-      //     bindActionReceiptInputData(
-      //       actionReceiptInputDataPrepare,
-      //       actionReceiptInputData
-      //     )
-      //   );
-      // }
-      // for (const actionReceiptOutputData of action_receipt_output_datas) {
-      //   queries.push(
-      //     bindActionReceiptOutputData(
-      //       actionReceiptOutputDataPrepare,
-      //       actionReceiptOutputData
-      //     )
-      //   );
-      // }
     }
 
     try {
@@ -181,78 +152,92 @@ export class Database extends DataSource {
     return 0;
   }
 
-  public getBlock(hash: string): Promise<Block> {
-    return getBlock(this.env, hash);
+  public getBlock(hash: string): Promise<Block | undefined> {
+    return getBlock(this.db, hash);
   }
 
-  public getBlocks(since_hash?: string, limit?: number): Promise<Block[]> {
-    return getBlocks(this.env, since_hash, limit);
+  public getBlocks(
+    since_block_hash?: string,
+    limit?: number
+  ): Promise<Block[]> {
+    return getBlocks(this.db, since_block_hash, limit);
   }
 
-  public async getChunk(hash: string): Promise<Chunk> {
-    return getChunk(this.env, hash);
+  public async getChunk(hash: string): Promise<Chunk | undefined> {
+    return getChunk(this.db, hash);
   }
 
   public async getChunks(
-    since_hash?: string,
+    since_chunk_hash?: string,
     limit?: number
   ): Promise<Chunk[]> {
-    return getChunks(this.env, since_hash, limit);
+    return getChunks(this.db, since_chunk_hash, limit);
   }
 
-  public async getTransaction(hash: string): Promise<Transaction> {
-    return getTransaction(this.env, hash);
+  public async getTransaction(hash: string): Promise<Transaction | undefined> {
+    return getTransaction(this.db, hash);
   }
 
   public async getTransactions(
-    since_hash?: string,
+    since_transaction_hash?: string,
     limit?: number
   ): Promise<Transaction[]> {
-    return getTransactions(this.env, since_hash, limit);
+    return getTransactions(this.db, since_transaction_hash, limit);
   }
 
-  public async getTransactionAction(hash: string): Promise<TransactionAction> {
-    return getTransactionAction(this.env, hash);
+  public async getTransactionAction(
+    transaction_hash: string,
+    index_in_transaction: number
+  ): Promise<TransactionAction | undefined> {
+    return getTransactionAction(
+      this.db,
+      transaction_hash,
+      index_in_transaction
+    );
   }
 
   public async getTransactionActions(
     since_hash?: string,
     limit?: number
   ): Promise<TransactionAction[]> {
-    return getTransactionActions(this.env, since_hash, limit);
+    return getTransactionActions(this.db, since_hash, limit);
   }
 
-  public async getReceipt(receipt_id: string): Promise<Receipt> {
-    return getReceipt(this.env, receipt_id);
+  public async getReceipt(receipt_id: string): Promise<Receipt | undefined> {
+    return getReceipt(this.db, receipt_id);
   }
 
   public async getReceipts(
     since_receipt_id?: string,
     limit?: number
   ): Promise<Receipt[]> {
-    return getReceipts(this.env, since_receipt_id, limit);
+    return getReceipts(this.db, since_receipt_id, limit);
   }
 
-  public async getDataReceipt(data_id: string): Promise<DataReceipt> {
-    return getDataReceipt(this.env, data_id);
+  public async getDataReceipt(
+    data_id: string
+  ): Promise<DataReceipt | undefined> {
+    return getDataReceipt(this.db, data_id);
   }
 
   public async getDataReceipts(
     since_data_id?: string,
     limit?: number
   ): Promise<DataReceipt[]> {
-    return getDataReceipts(this.env, since_data_id, limit);
+    return getDataReceipts(this.db, since_data_id, limit);
   }
 
-  public async getActionReceipt(receipt_id: string): Promise<ActionReceipt> {
-    return getActionReceipt(this.env, receipt_id);
+  public async getActionReceipt(
+    receipt_id: string
+  ): Promise<ActionReceipt | undefined> {
+    return getActionReceipt(this.db, receipt_id);
   }
 
   public async getActionReceipts(
     since_receipt_id?: string,
     limit?: number
   ): Promise<ActionReceipt[]> {
-    return getActionReceipts(this.env, since_receipt_id, limit);
+    return getActionReceipts(this.db, since_receipt_id, limit);
   }
 
   public async getActionReceiptAction(

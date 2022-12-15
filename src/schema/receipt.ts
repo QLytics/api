@@ -1,4 +1,7 @@
 import { gql } from 'apollo-server-cloudflare';
+import { Kysely } from 'kysely';
+
+import { DbSchema } from '../context/db-schema';
 
 export interface Receipt {
   receipt_id: string;
@@ -46,39 +49,45 @@ export const NewReceiptType = gql`
 `;
 
 export async function getReceipt(
-  env: Env,
+  db: Kysely<DbSchema>,
   receipt_id: string
-): Promise<Receipt> {
-  const receipt = await env.DB.prepare(
-    'SELECT * FROM receipts WHERE receipt_id = ?1'
-  )
-    .bind(receipt_id)
-    .first<Receipt>();
+): Promise<Receipt | undefined> {
+  const receipt = await db
+    .selectFrom('receipts')
+    .selectAll()
+    .where('receipt_id', '=', receipt_id)
+    .executeTakeFirst();
   return receipt;
 }
 
 export async function getReceipts(
-  env: Env,
+  db: Kysely<DbSchema>,
   since_receipt_id?: string,
   limit = 100
 ): Promise<Receipt[]> {
   let rowid = 0;
   if (since_receipt_id != null) {
     try {
-      rowid = (
-        await env.DB.prepare('SELECT rowid FROM receipts WHERE receipt_id = ?1')
-          .bind(since_receipt_id)
-          .first<{ rowid: number }>()
-      ).rowid;
+      rowid =
+        (
+          await db
+            .selectFrom('receipts')
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .select('rowid' as any)
+            .where('receipt_id', '=', since_receipt_id)
+            .executeTakeFirst()
+        )?.rowid ?? 0;
     } catch (err) {
       console.error(err);
       // ignore
     }
   }
-  const res = await env.DB.prepare(
-    'SELECT * FROM receipts WHERE rowid > ?1 LIMIT ?2'
-  )
-    .bind(rowid, limit)
-    .all<Receipt>();
-  return res.results ?? [];
+  const res = await db
+    .selectFrom('receipts')
+    .selectAll()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .where('rowid' as any, '>', rowid)
+    .limit(limit)
+    .execute();
+  return res;
 }

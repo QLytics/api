@@ -1,4 +1,7 @@
 import { gql } from 'apollo-server-cloudflare';
+import { Kysely } from 'kysely';
+
+import { DbSchema } from '../context/db-schema';
 
 export interface Transaction {
   transaction_hash: string;
@@ -18,7 +21,7 @@ export interface Transaction {
 }
 
 export interface GetTransactions {
-  since_hash?: string;
+  since_transaction_hash?: string;
   limit?: number;
 }
 
@@ -61,41 +64,45 @@ export const NewTransactionType = gql`
 `;
 
 export async function getTransaction(
-  env: Env,
+  db: Kysely<DbSchema>,
   hash: string
-): Promise<Transaction> {
-  const transaction = await env.DB.prepare(
-    'SELECT * FROM transactions WHERE transaction_hash = ?1'
-  )
-    .bind(hash)
-    .first<Transaction>();
-  return transaction;
+): Promise<Transaction | undefined> {
+  const receipt = await db
+    .selectFrom('transactions')
+    .selectAll()
+    .where('transaction_hash', '=', hash)
+    .executeTakeFirst();
+  return receipt;
 }
 
 export async function getTransactions(
-  env: Env,
-  since_hash?: string,
+  db: Kysely<DbSchema>,
+  since_transaction_hash?: string,
   limit = 100
 ): Promise<Transaction[]> {
   let rowid = 0;
-  if (since_hash != null) {
+  if (since_transaction_hash != null) {
     try {
-      rowid = (
-        await env.DB.prepare(
-          'SELECT rowid FROM transactions WHERE transaction_hash = ?1'
-        )
-          .bind(since_hash)
-          .first<{ rowid: number }>()
-      ).rowid;
+      rowid =
+        (
+          await db
+            .selectFrom('transactions')
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .select('rowid' as any)
+            .where('transaction_hash', '=', since_transaction_hash)
+            .executeTakeFirst()
+        )?.rowid ?? 0;
     } catch (err) {
       console.error(err);
       // ignore
     }
   }
-  const res = await env.DB.prepare(
-    'SELECT * FROM transactions WHERE rowid > ?1 LIMIT ?2'
-  )
-    .bind(rowid, limit)
-    .all<Transaction>();
-  return res.results ?? [];
+  const res = await db
+    .selectFrom('transactions')
+    .selectAll()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .where('rowid' as any, '>', rowid)
+    .limit(limit)
+    .execute();
+  return res;
 }

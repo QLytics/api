@@ -1,4 +1,7 @@
 import { gql } from 'apollo-server-cloudflare';
+import { Kysely } from 'kysely';
+
+import { DbSchema } from '../context/db-schema';
 
 export interface Block {
   block_hash: string;
@@ -11,7 +14,7 @@ export interface Block {
 }
 
 export interface GetBlocks {
-  since_hash?: string;
+  since_block_hash?: string;
   limit?: number;
 }
 
@@ -39,35 +42,46 @@ export const NewBlockType = gql`
   }
 `;
 
-export async function getBlock(env: Env, hash: string): Promise<Block> {
-  const block = await env.DB.prepare('SELECT * FROM blocks WHERE hash = ?1')
-    .bind(hash)
-    .first<Block>();
+export async function getBlock(
+  db: Kysely<DbSchema>,
+  hash: string
+): Promise<Block | undefined> {
+  const block = await db
+    .selectFrom('blocks')
+    .selectAll()
+    .where('block_hash', '=', hash)
+    .executeTakeFirst();
   return block;
 }
 
 export async function getBlocks(
-  env: Env,
-  since_hash?: string,
+  db: Kysely<DbSchema>,
+  since_block_hash?: string,
   limit = 100
 ): Promise<Block[]> {
   let rowid = 0;
-  if (since_hash != null) {
+  if (since_block_hash != null) {
     try {
-      rowid = (
-        await env.DB.prepare('SELECT rowid FROM blocks WHERE hash = ?1')
-          .bind(since_hash)
-          .first<{ rowid: number }>()
-      ).rowid;
+      rowid =
+        (
+          await db
+            .selectFrom('blocks')
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .select('rowid' as any)
+            .where('block_hash', '=', since_block_hash)
+            .executeTakeFirst()
+        )?.rowid ?? 0;
     } catch (err) {
       console.error(err);
       // ignore
     }
   }
-  const res = await env.DB.prepare(
-    'SELECT * FROM blocks WHERE rowid > ?1 LIMIT ?2'
-  )
-    .bind(rowid, limit)
-    .all<Block>();
-  return res.results ?? [];
+  const res = await db
+    .selectFrom('blocks')
+    .selectAll()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .where('rowid' as any, '>', rowid)
+    .limit(limit)
+    .execute();
+  return res;
 }

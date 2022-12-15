@@ -1,4 +1,7 @@
 import { gql } from 'apollo-server-cloudflare';
+import { Kysely } from 'kysely';
+
+import { DbSchema } from '../context/db-schema';
 
 export interface ActionReceipt {
   receipt_id: string;
@@ -31,41 +34,45 @@ export const NewActionReceiptType = gql`
 `;
 
 export async function getActionReceipt(
-  env: Env,
+  db: Kysely<DbSchema>,
   receipt_id: string
-): Promise<ActionReceipt> {
-  const receipt = await env.DB.prepare(
-    'SELECT * FROM action_receipts WHERE receipt_id = ?1'
-  )
-    .bind(receipt_id)
-    .first<ActionReceipt>();
-  return receipt;
+): Promise<ActionReceipt | undefined> {
+  const actionReceipt = await db
+    .selectFrom('action_receipts')
+    .selectAll()
+    .where('receipt_id', '=', receipt_id)
+    .executeTakeFirst();
+  return actionReceipt;
 }
 
 export async function getActionReceipts(
-  env: Env,
+  db: Kysely<DbSchema>,
   since_receipt_id?: string,
   limit = 100
 ): Promise<ActionReceipt[]> {
   let rowid = 0;
   if (since_receipt_id != null) {
     try {
-      rowid = (
-        await env.DB.prepare(
-          'SELECT rowid FROM action_receipts WHERE receipt_id = ?1'
-        )
-          .bind(since_receipt_id)
-          .first<{ rowid: number }>()
-      ).rowid;
+      rowid =
+        (
+          await db
+            .selectFrom('action_receipts')
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .select('rowid' as any)
+            .where('receipt_id', '=', since_receipt_id)
+            .executeTakeFirst()
+        )?.rowid ?? 0;
     } catch (err) {
       console.error(err);
       // ignore
     }
   }
-  const res = await env.DB.prepare(
-    'SELECT * FROM action_receipts WHERE rowid > ?1 LIMIT ?2'
-  )
-    .bind(rowid, limit)
-    .all<ActionReceipt>();
-  return res.results ?? [];
+  const res = await db
+    .selectFrom('action_receipts')
+    .selectAll()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .where('rowid' as any, '>', rowid)
+    .limit(limit)
+    .execute();
+  return res;
 }

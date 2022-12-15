@@ -1,5 +1,4 @@
 import type { IExecutableSchemaDefinition } from '@graphql-tools/schema';
-// import { BigIntResolver } from 'graphql-scalars';
 
 import { Context } from './context';
 import {
@@ -34,12 +33,10 @@ import {
   GetTransactions,
   Receipt,
   Transaction,
-  TransactionAction
+  TransactionActionPk
 } from './schema';
 
 export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
-  // BigInt: BigIntResolver,
-
   Query: {
     block: async (
       _: unknown,
@@ -50,10 +47,10 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
     },
     blocks: async (
       _: unknown,
-      { since_hash, limit }: GetBlocks,
+      { since_block_hash, limit }: GetBlocks,
       { dataSources }: Context
     ) => {
-      return dataSources.database.getBlocks(since_hash, limit);
+      return dataSources.database.getBlocks(since_block_hash, limit);
     },
     chunk: async (
       _: unknown,
@@ -64,10 +61,10 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
     },
     chunks: async (
       _: unknown,
-      { since_hash, limit }: GetChunks,
+      { since_chunk_hash, limit }: GetChunks,
       { dataSources }: Context
     ) => {
-      return dataSources.database.getChunks(since_hash, limit);
+      return dataSources.database.getChunks(since_chunk_hash, limit);
     },
     transaction: async (
       _: unknown,
@@ -78,17 +75,25 @@ export const resolvers: IExecutableSchemaDefinition['resolvers'] = {
     },
     transactions: async (
       _: unknown,
-      { since_hash, limit }: GetTransactions,
+      { since_transaction_hash, limit }: GetTransactions,
       { dataSources }: Context
     ) => {
-      return dataSources.database.getTransactions(since_hash, limit);
+      return dataSources.database.getTransactions(
+        since_transaction_hash,
+        limit
+      );
     },
     transactionAction: async (
       _: unknown,
-      { transaction_hash: hash }: TransactionAction,
+      {
+        pk: { transaction_hash, index_in_transaction }
+      }: { pk: TransactionActionPk },
       { dataSources }: Context
     ) => {
-      return dataSources.database.getTransactionAction(hash);
+      return dataSources.database.getTransactionAction(
+        transaction_hash,
+        index_in_transaction
+      );
     },
     transactionActions: async (
       _: unknown,
