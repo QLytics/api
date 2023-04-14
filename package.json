@@ -5,32 +5,34 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "start": "wrangler dev --env dev --local --persist",
+    "deploy": "wrangler publish",
     "format": "prettier --write  '*.{json,js}' 'src/**/*.{js,ts}'",
     "lint": "eslint --max-warnings=0 src && prettier --check '*.{json,js}' 'src/**/*.{js,ts}'"
   },
   "author": "Mario Reder <mario.reder@pm.me>",
   "license": "MIT",
   "dependencies": {
-    "apollo-datasource": "^3",
-    "apollo-server-cloudflare": "^3",
-    "graphql": "^16",
-    "kysely": "^0.22",
-    "kysely-d1": "^0.0.6"
+    "apollo-datasource": "^3.3.2",
+    "apollo-server-cloudflare": "^3.12.0",
+    "graphql": "^16.6.0",
+    "kysely": "^0.24.2",
+    "kysely-d1": "^0.3.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4",
-    "@databases/split-sql-query": "^1",
-    "@databases/sql": "^3",
-    "@graphql-tools/schema": "^9",
-    "@typescript-eslint/eslint-plugin": "^5",
-    "@typescript-eslint/parser": "^5",
-    "eslint": "^8",
-    "eslint-config-prettier": "^8",
+    "@cloudflare/workers-types": "^4.20230404.0",
+    "@databases/split-sql-query": "^1.0.3",
+    "@databases/sql": "^3.3.0",
+    "@graphql-tools/schema": "^9.0.18",
+    "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "@typescript-eslint/parser": "^5.58.0",
+    "eslint": "^8.38.0",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-config-typescript": "^3",
-    "eslint-plugin-import": "^2",
-    "eslint-plugin-prettier": "^4",
-    "prettier": "^2",
-    "typescript": "4.9",
-    "wrangler": "^2"
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.7",
+    "typescript": "5.0",
+    "wrangler": "^2.15.1"
   }
 }
